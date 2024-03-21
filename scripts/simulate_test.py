@@ -27,8 +27,9 @@ from utils.push_dof_tools import *
 class PushSim(object):
     def __init__(self):
         # set default push velocities
-        self.num_samples = 1000
-        self.pushing_directions = fibonacci_sphere(self.num_samples * 2)
+        self.num_samples = 100
+        # self.pushing_directions = fibonacci_sphere(self.num_samples * 2)
+        self.pushing_directions = linear_velocities(self.num_samples * 2)
         self.icrs = velocities2icrs(self.pushing_directions)
 
         # initialize gym
@@ -39,7 +40,6 @@ class PushSim(object):
         parser.add_argument('--config', type=str, help='Configuration file')
         parser.add_argument('--asset_dir', type=str, help='Directory of asset folder')
         self.args = parser.parse_args()
-
 
         # configure sim
         self._load_configuration()
@@ -89,7 +89,15 @@ class PushSim(object):
         # Initial distance between pusher and the slider
         self.initial_distance = sim_cfg["initial_distance"]
         # Gripper width
-        self.gripper_width = sim_cfg["gripper_width"]
+        self.gripper_width = sim_cfg["max_gripper_width"]
+        # Gripper height
+        self.gripper_height = sim_cfg["gripper_height"]
+        # Gripper height
+        self.gripper_angle = np.deg2rad(sim_cfg["gripper_angle"] - 90)
+        # Gripper height
+        self.rand_height = sim_cfg["rand_height"]
+        # Gripper height
+        self.rand_angle = sim_cfg["rand_angle"]
         
         # Slider initial contact perturbation
         self.contact_offset_position_range = sim_cfg["contact_offset_position_range"]
@@ -198,7 +206,7 @@ class PushSim(object):
         self.viewer = self.gym.create_viewer(self.sim, gymapi.CameraProperties())
         # position the camera
         # cam_pos = gymapi.Vec3(2, 0, 5)
-        cam_pos = gymapi.Vec3(0, 0, 3)
+        cam_pos = gymapi.Vec3(1, 0, 3)
         # cam_target = gymapi.Vec3(2, 8, -26)
         cam_target = gymapi.Vec3(2, 8, -26)
 
@@ -243,7 +251,7 @@ class PushSim(object):
         self.pusher_actor_handles = []
         self.camera_handles = []
         self.contact_angles = []
-
+        self.contact_heights = []
         
         for env_idx in range(self.num_envs):
             # Create environment
@@ -269,8 +277,6 @@ class PushSim(object):
             # Set actor segmentation IDs
             self.gym.set_rigid_body_segmentation_id(env, slider_actor_handle, 0, 1)
             self.gym.set_rigid_body_segmentation_id(env, pusher_actor_handle, 0, 2)
-            # Create hand-eye camera sensor and attach to the pusher eef
-            # self.create_hand_eye_camera(env, pusher_actor_handle)
             
             # Create camera sensors
             camera_handle = self.create_camera_sensors(env)
@@ -297,8 +303,16 @@ class PushSim(object):
             self.camera_handles.append(camera_handle)      
             
             self.gym.draw_viewer(self.viewer, self.sim, False) 
-            self.contact_angles.append(-math.pi/2*((env_idx+1)/self.num_envs))
             
+        if self.rand_angle:
+            self.contact_angles = -math.pi/2 * np.random.rand(self.num_envs)
+        else:
+            self.contact_angles = np.repeat(self.gripper_angle, self.num_envs)
+        if self.rand_height:
+            self.contact_heights = self.gripper_height + (0.07 - self.gripper_height) * np.random.rand(self.num_envs)
+        else:
+            self.contact_heights = np.repeat(self.gripper_height, self.num_envs)
+
     def load_slider_asset(self):
         # Load slider asset
         slider_directory =  "{}/{}/{}".format(
@@ -778,7 +792,7 @@ class PushSim(object):
             # pusher_rot = R.from_euler('xyz', [0, self.contact_angles[env_idx], push_angl_z], degrees=False).as_quat()
             
             new_pusher_pose = gymapi.Transform()
-            new_pusher_pose.p = gymapi.Vec3(pusher_pos_xy[0], pusher_pos_xy[1], 0.02)
+            new_pusher_pose.p = gymapi.Vec3(pusher_pos_xy[0], pusher_pos_xy[1], self.contact_heights[env_idx])
             new_pusher_pose.r = gymapi.Quat(pusher_rot[0], pusher_rot[1], pusher_rot[2], pusher_rot[3])
             
             pusher_rigid_body_handle = self.gym.get_actor_rigid_body_handle(self.envs[env_idx], self.pusher_actor_handles[env_idx],0)

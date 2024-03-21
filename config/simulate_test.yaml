@@ -6,7 +6,7 @@ simulation:
   compute_device_id: 0
   graphics_device_id: 0
   physics_engine: PHYSX
-  num_envs: 15
+  num_envs: 20
   dt: 0.016667
   camera: ZividTwo
 
@@ -14,17 +14,20 @@ simulation:
   # slider(dish mesh)
   slider_dataset: urdf
   # slider_name: takeout_cup_65oz
-  slider_name: takeout_cup_16oz
+  slider_name: takeout_cup_16oz_10
   # Pusher
   pusher_dataset: pusher_urdf
   pusher_name: pusher_vertical
 
   # Push experiment setup
   push_speed: 0.1
-  translational_push_distance: 0.005 # 0.01
-  # initial_distance: 0.05
   initial_distance: 0.2
-  gripper_width: 0.08
+  translational_push_distance: 0.005 # 0.01
+  max_gripper_width: 0.08
+  gripper_height: 0.02
+  gripper_angle: 0 # 0 ~ 90 [degree]
+  rand_height: True
+  rand_angle: True
 
   # Slider setup
   slider_rand_position_range: 0.15 # meters 0.05
