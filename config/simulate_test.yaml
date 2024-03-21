@@ -14,7 +14,7 @@ simulation:
   # slider(dish mesh)
   slider_dataset: urdf
   # slider_name: takeout_cup_65oz
-  slider_name: takeout_cup_16oz_10
+  slider_name: takeout_cup_16oz
   # Pusher
   pusher_dataset: pusher_urdf
   pusher_name: pusher_vertical
