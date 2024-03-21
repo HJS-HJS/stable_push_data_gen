@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="mug_cup02_3">
+  <link name="mug_cup02_3">
+    <inertial>
+      <mass value="0.6111256604394253" />
+      <inertia ixx="0.002594025860092378" ixy="0.00010560989418210814" ixz="-1.663554977290271e-05" iyy="0.0019082419265194859" iyz="2.0200475379733475e-05" izz="0.0035751222595245807" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/mug_cup02_3/mug_cup02_3.STL" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/mug_cup02_3/mug_cup02_3.STL" scale="1 1 1" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

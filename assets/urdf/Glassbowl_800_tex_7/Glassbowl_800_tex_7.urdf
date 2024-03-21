@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="Glassbowl_800_tex_7">
+  <link name="Glassbowl_800_tex_7">
+    <inertial>
+      <mass value="1.0134182627094515" />
+      <inertia ixx="0.0011212658521697035" ixy="-5.5605639128913836e-05" ixz="4.956968661277912e-06" iyy="0.004045664039338673" iyz="5.983956596714693e-05" izz="0.005132477376605399" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/Glassbowl_800_tex_7/Glassbowl_800_tex_7.obj" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/Glassbowl_800_tex_7/Glassbowl_800_tex_7.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

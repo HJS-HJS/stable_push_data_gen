@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="Y6995_cerembowl_8">
+  <link name="Y6995_cerembowl_8">
+    <inertial>
+      <mass value="-0.06604364599017612" />
+      <inertia ixx="-0.00013634587057149633" ixy="6.699595495718044e-10" ixz="-3.9226117158298225e-09" iyy="-0.0002472451412195077" iyz="3.824709455839277e-10" izz="-0.0003569458465256751" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/Y6995_cerembowl_8/Y6995_cerembowl_8.obj" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/Y6995_cerembowl_8/Y6995_cerembowl_8.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

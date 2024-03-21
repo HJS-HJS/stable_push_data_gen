@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="melamineware_g_0412_0">
+  <link name="melamineware_g_0412_0">
+    <inertial>
+      <mass value="0.06764885309375519" />
+      <inertia ixx="0.00018674197276807923" ixy="-1.3925475893491945e-07" ixz="-1.1375070389081025e-07" iyy="5.256102039965684e-05" iyz="1.5697277253545577e-07" izz="0.00021264813953956397" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/melamineware_g_0412_0/melamineware_g_0412_0.stl" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/melamineware_g_0412_0/melamineware_g_0412_0.stl" scale="1 1 1" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

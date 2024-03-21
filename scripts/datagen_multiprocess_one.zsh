@@ -18,7 +18,7 @@ DISH_LIST=($(ls $URDF_DIR))
 # Iterate over the array and run the Python script with different files
 for dish in "${DISH_LIST[@]}"
 do
-    if [ $dish = '64ccb121147c56af48ce81ccd3000f65' ] ; then
+    if [ $dish = 'takeout_cup_13oz' ] ; then
         sudo pkill python3
         python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
     fi

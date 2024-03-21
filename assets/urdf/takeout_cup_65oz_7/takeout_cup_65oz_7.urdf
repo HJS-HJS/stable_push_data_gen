@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="takeout_cup_65oz_7">
+  <link name="takeout_cup_65oz_7">
+    <inertial>
+      <mass value="0.13062482344406012" />
+      <inertia ixx="0.000341921819229106" ixy="7.302962746489288e-12" ixz="-1.2231890850111723e-11" iyy="0.0004800994093426117" iyz="-2.784710608827498e-08" izz="0.0006890906771609917" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/takeout_cup_65oz_7/takeout_cup_65oz_7.STL" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/takeout_cup_65oz_7/takeout_cup_65oz_7.STL" scale="1 1 1" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

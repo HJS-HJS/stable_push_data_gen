@@ -39,7 +39,7 @@ class PushSim(object):
         parser = argparse.ArgumentParser(description="Push Sim: Push simulation of tableware for stable pushing network training data generation")
         parser.add_argument('--config', type=str, default="/home/rise/catkin_ws/src/stable-pushnet-datagen/config/config_pushsim.yaml", help='Configuration file')
         parser.add_argument('--asset_dir', type=str, help='Directory of asset folder')
-        parser.add_argument('--headless', type=bool, default=False, help='Turn on the viewer')
+        parser.add_argument('--headless', type=bool, default=True, help='Turn on the viewer')
         parser.add_argument('--save_results', action='store_true', help='save results')
         parser.add_argument('--slider_name', type=str, help='Slider Name')
         self.args = parser.parse_args()
@@ -420,8 +420,8 @@ class PushSim(object):
         pusher_dof_state = np.zeros(pusher_num_dofs, gymapi.DofState.dtype)
         pusher_dof_state["pos"] = pusher_mids
         
-        # Give a desired pose for first 3 robot joints to improve stability
-        pusher_dof_props["driveMode"][0:3] = gymapi.DOF_MODE_POS
+        # Give a desired pose for first 4 robot joints to improve stability
+        pusher_dof_props["driveMode"][0:4] = gymapi.DOF_MODE_POS
         pusher_dof_props['stiffness'] = 5000
         pusher_dof_props['damping'] = 1000
         
@@ -599,10 +599,18 @@ class PushSim(object):
         # plt.show()
         
         # sample a contact point
-        spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, self.gripper_width)
-        ci = CropImageParallel(self.num_envs, self.camera_intrinsic, self.gripper_width)
-        print("Sampling push contacts...")
-        push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
+        _gripper_width = self.gripper_width
+        while True:
+            try:
+                spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, _gripper_width)
+                ci = CropImageParallel(self.num_envs, self.camera_intrinsic, _gripper_width)
+                print("Sampling push contacts")
+                push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
+                print('Generate contact points with gripper width:', _gripper_width, '[m]')
+                break
+            except:
+                _gripper_width -= 0.01
+                print('Retring contact point sampling with gripper width', _gripper_width, '[m]')
         
         # push_contact = push_contact_list[0]
         # edge_list_uv = push_contact.edge_uv
@@ -716,9 +724,8 @@ class PushSim(object):
             
             if push_contact_list[env_idx] is None:
                 continue
-            
-            # self.draw_viewer_push_contact(env_idx, push_contact_list[env_idx])
-            self.draw_viewer_trajectories(env_idx, np.concatenate((approach_trajectories[env_idx],pushing_trajectories[env_idx]), axis=0))
+            if self.headless:
+                self.draw_viewer_trajectories(env_idx, np.concatenate((approach_trajectories[env_idx],pushing_trajectories[env_idx]), axis=0))
             
         print('move pusher to init position')
         self.move_pusher(approach_trajectories)
@@ -862,7 +869,7 @@ class PushSim(object):
             pusher_rot = R.from_euler('z', push_angl_z, degrees=False).as_quat()
             
             new_pusher_pose = gymapi.Transform()
-            new_pusher_pose.p = gymapi.Vec3(pusher_pos_xy[0], pusher_pos_xy[1], 0)
+            new_pusher_pose.p = gymapi.Vec3(pusher_pos_xy[0], pusher_pos_xy[1], self.contact_heights[env_idx])
             new_pusher_pose.r = gymapi.Quat(pusher_rot[0], pusher_rot[1], pusher_rot[2], pusher_rot[3])
             
             pusher_rigid_body_handle = self.gym.get_actor_rigid_body_handle(self.envs[env_idx], self.pusher_actor_handles[env_idx],0)
@@ -933,7 +940,7 @@ class PushSim(object):
         
         for waypoint_idx, waypoint in enumerate(waypoints):
             for env_idx in range(self.num_envs):
-                self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], waypoint[env_idx])
+                self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], np.append(waypoint[env_idx], self.contact_angles[env_idx]).astype(np.float32))
                     
             # Step the physics
             self.gym.simulate(self.sim)

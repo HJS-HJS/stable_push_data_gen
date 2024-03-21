@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="93549505ef8635c1bcbf660e2675e1a7_3">
+  <link name="93549505ef8635c1bcbf660e2675e1a7_3">
+    <inertial>
+      <mass value="0.5245244860291178" />
+      <inertia ixx="0.0018712793201179595" ixy="-6.1291843201173035e-06" ixz="-1.4274218574054995e-06" iyy="0.0003565808111628348" iyz="-1.7756633464342283e-06" izz="0.0021802946032719534" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/93549505ef8635c1bcbf660e2675e1a7_3/93549505ef8635c1bcbf660e2675e1a7_3.obj" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/93549505ef8635c1bcbf660e2675e1a7_3/93549505ef8635c1bcbf660e2675e1a7_3.obj" scale="1 1 1" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

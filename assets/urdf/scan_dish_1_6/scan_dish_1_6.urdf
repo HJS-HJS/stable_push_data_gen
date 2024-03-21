@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="scan_dish_1_6">
+  <link name="scan_dish_1_6">
+    <inertial>
+      <mass value="0.44889360314082566" />
+      <inertia ixx="0.0019956250721142234" ixy="1.1865021653975682e-05" ixz="3.2065858379316597e-06" iyy="0.0038406074058890483" iyz="1.0564538686950114e-06" izz="0.005771417108881424" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/scan_dish_1_6/scan_dish_1_6.stl" scale="1 1 1" />
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/scan_dish_1_6/scan_dish_1_6.stl" scale="1 1 1" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

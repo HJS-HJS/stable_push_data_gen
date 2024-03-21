@@ -76,10 +76,10 @@ def obj_to_urdf(mesh_dir):
             max_dim = np.max(exts)
             scale = GRIPPER_WIDTH / max_dim
             scale = scale * 1.34
-            mesh.apply_scale(0.001) # mm to m scale
-            mesh_tri.apply_scale(0.001) # mm to m scale
-            # mesh.apply_scale(scale) # mm to m scale
-            # mesh_tri.apply_scale(scale) # mm to m scale
+            # mesh.apply_scale(0.001) # mm to m scale
+            # mesh_tri.apply_scale(0.001) # mm to m scale
+            mesh.apply_scale(scale) # mm to m scale
+            mesh_tri.apply_scale(scale) # mm to m scale
 
             trimesh.repair.broken_faces(mesh_tri)
             trimesh.repair.fix_inversion(mesh_tri, multibody=True)
@@ -135,6 +135,7 @@ def obj_to_urdf(mesh_dir):
             tree = ET.ElementTree(urdf)
             with open(os.path.join(urdf_root_dir, mesh_name, mesh_name + '.urdf'), 'wb') as f:
                 tree.write(f, encoding='utf-8', xml_declaration=True)
+            mesh_tri.apply_scale(100) # to find better stable pose (bigger, the better find stable pose)
 
             # get stable poses
             stable_poses, prob = mesh_tri.compute_stable_poses(center_mass=mesh_tri.center_mass,n_samples=10, sigma=0.1)
