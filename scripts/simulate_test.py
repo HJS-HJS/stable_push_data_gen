@@ -1,23 +1,16 @@
 # import python modules
 import time
-import os
 import yaml
 import argparse
-import pickle
-import trimesh
-import math
 
 # import isaacgym modules
-from isaacgym import gymapi, gymutil, gymtorch
-# from isaacgym.torch_utils import *
+from isaacgym import gymapi
 
 # import 3rd party modules
 import numpy as np
 import torch
 from scipy.spatial.transform import Rotation as R
-import cv2
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 
 # import local modules
 from utils.crop_image_parallel import CropImageParallel
@@ -44,8 +37,8 @@ class PushSim(object):
         # configure sim
         self._load_configuration()
         self._create_simulation()
-        self._create_ground()
         self.gym.prepare_sim(self.sim) # Prepare simulation with buffer allocations
+        self._create_ground()
         self._create_viewer()
         self._create_environments()
 
@@ -74,7 +67,7 @@ class PushSim(object):
         self.dt = sim_cfg["dt"]
         
         # Asset name setup
-        # slider(dish mesh)
+        # slider(dish urdf folder name)
         self.slider_dataset_name = sim_cfg["slider_dataset"]
         self.slider_name = sim_cfg["slider_name"]
         # Pusher
@@ -89,7 +82,7 @@ class PushSim(object):
         # Initial distance between pusher and the slider
         self.initial_distance = sim_cfg["initial_distance"]
         # Gripper width
-        self.gripper_width = sim_cfg["max_gripper_width"]
+        self.gripper_width = sim_cfg["gripper_width"]
         # Gripper height
         self.gripper_height = sim_cfg["gripper_height"]
         # Gripper height
@@ -305,7 +298,7 @@ class PushSim(object):
             self.gym.draw_viewer(self.viewer, self.sim, False) 
             
         if self.rand_angle:
-            self.contact_angles = -math.pi/2 * np.random.rand(self.num_envs)
+            self.contact_angles = -np.pi/2 * np.random.rand(self.num_envs)
         else:
             self.contact_angles = np.repeat(self.gripper_angle, self.num_envs)
         if self.rand_height:

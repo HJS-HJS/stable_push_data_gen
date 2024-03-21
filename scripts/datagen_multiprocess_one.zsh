@@ -10,7 +10,7 @@ ASSSET_DIR="$MODULE_DIR/assets"
 # Absolute path to the directory where urdf is located
 URDF_DIR="$MODULE_DIR/assets/urdf"
 # Absolute path to the directory where config is located (.yaml)
-CONFIG_DIR="$MODULE_DIR/config/config_pushsim.yaml"
+CONFIG_DIR="$MODULE_DIR/config/simulate_test.yaml"
 
 # Get the list of file names in the directory
 DISH_LIST=($(ls $URDF_DIR))
@@ -20,6 +20,6 @@ for dish in "${DISH_LIST[@]}"
 do
     if [ $dish = '64ccb121147c56af48ce81ccd3000f65' ] ; then
         sudo pkill python3
-        # python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --save_results --slider_name $dish
+        python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
     fi
 done
