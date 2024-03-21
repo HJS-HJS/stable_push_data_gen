@@ -192,8 +192,8 @@ def icrs2trajectories(icrs, approach_distance, push_speed, dt):
     '''
     
     # push_distance = 0.05 # m, 0.05*pi
-    # push_distance = 0.2 # m
-    push_distance = 0.5 # m
+    push_distance = 0.2 # m
+    # push_distance = 0.5 # m
     # push_distance = 0.628 # m, 0.2*pi
     
     push_time = push_distance / push_speed

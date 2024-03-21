@@ -39,7 +39,7 @@ class PushSim(object):
         parser = argparse.ArgumentParser(description="Push Sim: Push simulation of tableware for stable pushing network training data generation")
         parser.add_argument('--config', type=str, default="/home/rise/catkin_ws/src/stable-pushnet-datagen/config/config_pushsim.yaml", help='Configuration file')
         parser.add_argument('--asset_dir', type=str, help='Directory of asset folder')
-        parser.add_argument('--headless', type=bool, default=True, help='Turn on the viewer')
+        parser.add_argument('--headless', type=bool, default=False, help='Turn on the viewer')
         parser.add_argument('--save_results', action='store_true', help='save results')
         parser.add_argument('--slider_name', type=str, help='Slider Name')
         self.args = parser.parse_args()
@@ -591,13 +591,26 @@ class PushSim(object):
         depth_images, segmasks = self.get_camera_image()
         push_contact_list = []
 
-        # fig = plt.figure(figsize=(10,10))
-        # col = int(np.ceil(np.sqrt(self.num_envs)))
-        # for i in range(self.num_envs):
-        #     ax = fig.add_subplot(col,col,i+1)
-        #     ax.imshow(depth_images[i])
-        # plt.show()
+#############################################################################################
+                    # temp
+#############################################################################################
+        fig = plt.figure(figsize=(10,10))
+        col = int(np.ceil(np.sqrt(self.num_envs)))
+        for i in range(self.num_envs):
+            ax = fig.add_subplot(col,col,i+1)
+            ax.imshow(depth_images[i])
+        plt.show()
+
+        fig = plt.figure(figsize=(10,10))
+        col = int(np.ceil(np.sqrt(self.num_envs)))
+        for i in range(self.num_envs):
+            ax = fig.add_subplot(col,col,i+1)
+            ax.imshow(segmasks[i])
+        plt.show()
         
+#############################################################################################
+                    # temp
+#############################################################################################
         # sample a contact point
         _gripper_width = self.gripper_width
         while True:
@@ -772,8 +785,8 @@ class PushSim(object):
                 
                 # Save each pushing direction (network input)
                 with open(os.path.join(self.save_dir, 'velocity' + name), 'wb') as f:
-                    np.save(f, pushing_directions[env_idx])
-                
+                    np.save(f, np.array([0, pushing_directions[env_idx][0], self.contact_heights[env_idx], self.contact_angles[env_idx]]))
+
                 # Save each label (network output)
                 with open(os.path.join(self.save_dir, 'label' + name), 'wb') as f:
                     np.save(f, labels[env_idx])
