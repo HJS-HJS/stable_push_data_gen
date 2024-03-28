@@ -832,6 +832,8 @@ class PushSim(object):
         for i in range(self.num_envs):
             
             depth_image = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_DEPTH)
+            print(depth_image)
+            print(depth_image.shape)
             segmask = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_SEGMENTATION)
             # Change data type for lighter storage
             depth_image = np.array(depth_image, dtype = np.float32)
