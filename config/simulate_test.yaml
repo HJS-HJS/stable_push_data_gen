@@ -8,7 +8,7 @@ simulation:
   graphics_device_id: 0
   physics_engine: PHYSX
   num_iters: 3
-  num_envs: 180
+  num_envs: 100
   dt: 0.016667
   camera: IntelRealSenseD415
   # camera: ZividTwo
