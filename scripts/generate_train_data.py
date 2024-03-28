@@ -579,6 +579,7 @@ class PushSim(object):
         self.gym.fetch_results(self.sim, True)
         
         # step rendering
+        print("Rendering")
         self.gym.step_graphics(self.sim)
         if not self.headless:
             self.gym.draw_viewer(self.viewer, self.sim, False)
