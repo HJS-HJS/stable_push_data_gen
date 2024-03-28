@@ -8,13 +8,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/fa23aa60ec51c8e4c40fe5637f0a27e1_8/fa23aa60ec51c8e4c40fe5637f0a27e1_8.obj" scale="1 1 1" />
+        <mesh filename="/home/jongsoo/catkin_ws/src/stable_push_data_check/assets/urdf//fa23aa60ec51c8e4c40fe5637f0a27e1_8/fa23aa60ec51c8e4c40fe5637f0a27e1_8.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/fa23aa60ec51c8e4c40fe5637f0a27e1_8/fa23aa60ec51c8e4c40fe5637f0a27e1_8.obj" scale="1 1 1" />
+        <mesh filename="/home/jongsoo/catkin_ws/src/stable_push_data_check/assets/urdf//fa23aa60ec51c8e4c40fe5637f0a27e1_8/fa23aa60ec51c8e4c40fe5637f0a27e1_8.obj" scale="1 1 1" />
       </geometry>
     </collision>
   </link>

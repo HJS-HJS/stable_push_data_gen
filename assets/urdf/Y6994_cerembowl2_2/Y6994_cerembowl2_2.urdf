@@ -8,13 +8,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/Y6994_cerembowl2_2/Y6994_cerembowl2_2.obj" scale="1 1 1" />
+        <mesh filename="/home/jongsoo/catkin_ws/src/stable_push_data_check/assets/urdf//Y6994_cerembowl2_2/Y6994_cerembowl2_2.obj" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_check/assets/urdf/Y6994_cerembowl2_2/Y6994_cerembowl2_2.obj" scale="1 1 1" />
+        <mesh filename="/home/jongsoo/catkin_ws/src/stable_push_data_check/assets/urdf//Y6994_cerembowl2_2/Y6994_cerembowl2_2.obj" scale="1 1 1" />
       </geometry>
     </collision>
   </link>
