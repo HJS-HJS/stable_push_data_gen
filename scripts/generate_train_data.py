@@ -595,6 +595,7 @@ class PushSim(object):
         self.gym.draw_viewer(self.viewer, self.sim, True)
 
         # get images
+        print("Get Camera Images")
         depth_images, depth_noise_images, segmasks = self.get_camera_image()
         push_contact_list = []
 
