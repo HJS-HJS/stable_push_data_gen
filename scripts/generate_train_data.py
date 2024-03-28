@@ -579,7 +579,6 @@ class PushSim(object):
         self.gym.fetch_results(self.sim, True)
         
         # step rendering
-        print("Rendering")
         self.gym.step_graphics(self.sim)
         if not self.headless:
             self.gym.draw_viewer(self.viewer, self.sim, False)
@@ -596,7 +595,6 @@ class PushSim(object):
         self.gym.draw_viewer(self.viewer, self.sim, True)
 
         # get images
-        print("Get Camera Images")
         depth_images, depth_noise_images, segmasks = self.get_camera_image()
         push_contact_list = []
 
@@ -834,8 +832,6 @@ class PushSim(object):
         for i in range(self.num_envs):
             
             depth_image = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_DEPTH)
-            print(depth_image)
-            print(depth_image.shape)
             segmask = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_SEGMENTATION)
             # Change data type for lighter storage
             depth_image = np.array(depth_image, dtype = np.float32)
