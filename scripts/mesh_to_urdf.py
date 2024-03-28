@@ -76,18 +76,31 @@ def obj_to_urdf(mesh_dir):
             max_dim = np.max(exts)
             scale = GRIPPER_WIDTH / max_dim
             scale = scale * 1.34
-            # mesh.apply_scale(0.001) # mm to m scale
-            # mesh_tri.apply_scale(0.001) # mm to m scale
-            mesh.apply_scale(scale) # mm to m scale
-            mesh_tri.apply_scale(scale) # mm to m scale
+            print('center_of_mass', mesh_tri.center_mass)
+            mesh.apply_scale(0.001) # mm to m scale
+            mesh_tri.apply_scale(0.001) # mm to m scale
+            # print('center_of_mass', mesh_tri.center_mass)
+            # mesh.apply_scale(scale) # mm to m scale
+            # mesh_tri.apply_scale(scale) # mm to m scale
 
             trimesh.repair.broken_faces(mesh_tri)
             trimesh.repair.fix_inversion(mesh_tri, multibody=True)
-
+            print('center_of_mass', mesh_tri.center_mass)
+    
             mesh.density = DENSE_PET
             mesh_tri.density = DENSE_PET
+            print('vertice: ', mesh_tri.vertices)
+            print('inertia: ', mesh_tri.moment_inertia)
             mesh.vertices -= mesh_tri.center_mass
             mesh_tri.vertices -= mesh_tri.center_mass
+            print('vertice: ', mesh_tri.vertices)
+            print('inertia: ', mesh_tri.moment_inertia)
+            print('center_of_mass', mesh_tri.center_mass)
+
+            scene = trimesh.Scene()
+            scene.add_geometry(mesh)
+            scene.add_geometry(trimesh.creation.axis())
+            scene.show()
 
             print(
                 '\tVolume[m^3]\tMass[kg]\tScale[-]\tMax Dim[m]\n',

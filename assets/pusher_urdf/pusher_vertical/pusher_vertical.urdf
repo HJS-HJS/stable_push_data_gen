@@ -13,7 +13,7 @@
   </link>
 
   <link name="link1">
-  <inertial>
+    <inertial>
       <mass value="0.05" />
       <inertia ixx="0.000016667" ixy="0" ixz="0" iyy="0.000016667" iyz="0" izz="0.000016667" />
     </inertial>
@@ -33,7 +33,7 @@
   </joint>
 
   <link name="link2">
-  <inertial>
+    <inertial>
       <mass value="0.05" />
       <inertia ixx="0.000016667" ixy="0" ixz="0" iyy="0.000016667" iyz="0" izz="0.000016667" />
     </inertial>
@@ -42,9 +42,9 @@
         <box size="0.0 0.0 0.0"/>
       </geometry>
     </visual>
-    </link>
+  </link>
 
- <joint name="joint2" type="prismatic">
+  <joint name="joint2" type="prismatic">
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <parent link="link1"/>
     <child link="link2"/>
@@ -54,18 +54,18 @@
   </joint>
 
   <link name="eef">
-  <inertial>
+    <inertial>
       <mass value="0.05" />
       <inertia ixx="0.000016667" ixy="0" ixz="0" iyy="0.000016667" iyz="0" izz="0.000016667" />
     </inertial>
     <visual>
       <geometry>
-        <box size="0.01 0.01 0.01"/>
+        <box size="0.01 0.08 0.01"/>
       </geometry>
     </visual>
-    </link>
+  </link>
 
- <joint name="joint3" type="revolute">
+  <joint name="eef" type="revolute">
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-2.8973" soft_upper_limit="2.8973"/>
     <parent link="link2"/>
     <child link="eef"/>
@@ -73,16 +73,16 @@
     <dynamics damping="10.0"/>
     <limit effort="10" lower="-10" upper="10" velocity="10"/>
   </joint>
-  
-<link name="eef_y">
+    
+  <link name="eef_y">
     <visual>
       <geometry>
         <box size="0.0 0.0 0.0"/>
       </geometry>
     </visual>
-    </link>
+  </link>
 
- <joint name="eef_y_joint" type="revolute">
+  <joint name="eef_y_joint" type="revolute">
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-2.8973" soft_upper_limit="2.8973"/>
     <parent link="eef"/>
     <child link="eef_y"/>
@@ -91,9 +91,8 @@
     <limit effort="100" lower="-10" upper="10" velocity="100"/>
   </joint>
 
-
   <link name="left_finger">
-  <inertial>
+    <inertial>
       <mass value="0.05" />
       <inertia ixx="0.000585417" ixy="0" ixz="0" iyy="0.000092417" iyz="0" izz="0.000573667" />
     </inertial>
@@ -110,7 +109,7 @@
   </link>
 
   <link name="right_finger">
-  <inertial>
+    <inertial>
       <mass value="0.05" />
       <inertia ixx="0.000585417" ixy="0" ixz="0" iyy="0.000092417" iyz="0" izz="0.000573667" />
     </inertial>
@@ -126,22 +125,24 @@
     </collision>
   </link>
 
- <joint name="joint4" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0.025 0.105"/>
+  <joint name="joint4" type="prismatic">
+    <!-- <origin rpy="0 0 0" xyz="0 0.025 0.105"/> -->
+    <origin rpy="0 0 0" xyz="0 0.04 0.100"/>
     <parent link="eef_y"/>
     <child link="left_finger"/>
-    <axis xyz="1 0 0"/>
+    <axis xyz="0 1 0"/>
     <dynamics damping="10.0"/>
-    <limit effort="20" lower="0.0" upper="0.04" velocity="0.2"/>
+    <limit effort="20" lower="-0.04" upper="0.04" velocity="10"/>
   </joint>
-  
-  <joint name="joint5" type="fixed">
-    <origin rpy="0 0 0" xyz="0 -0.025 0.105"/>
+    
+  <joint name="joint5" type="prismatic">
+    <!-- <origin rpy="0 0 0" xyz="0 -0.025 0.100"/> -->
+    <origin rpy="0 0 0" xyz="0 -0.04 0.100"/>
     <parent link="eef_y"/>
     <child link="right_finger"/>
-    <axis xyz="-1 0 0"/>
+    <axis xyz="0 -1 0"/>
     <dynamics damping="10.0"/>
-    <limit effort="20" lower="0.0" upper="0.04" velocity="0.2"/>
+    <limit effort="20" lower="-0.04" upper="0.04" velocity="10"/>
   </joint>
 
-</robot>
+  </robot>

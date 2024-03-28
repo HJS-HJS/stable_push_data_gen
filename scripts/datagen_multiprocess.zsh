@@ -16,12 +16,12 @@ CONFIG_DIR="$MODULE_DIR/config/simulate_test.yaml"
 DISH_LIST=($(ls $URDF_DIR))
 
 # Iterate over the array and run the Python script with different files
+dish_order=1
+
 for dish in "${DISH_LIST[@]}"
 do
-    # if [ $dish = 'takeout_cup_65oz' ] ; then
-    if [ $dish = 'mug_cup02' ] ; then
-        sudo pkill python3
-        python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
-        # python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
-    fi
+    echo "#$dish_order / ${#DISH_LIST[*]}"
+    python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
+    # python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
+    ((dish_order+=1))
 done

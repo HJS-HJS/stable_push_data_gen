@@ -8,6 +8,7 @@ from scipy.spatial.transform import Rotation as R
 import trimesh
 from scipy.spatial import ConvexHull
 from scipy.interpolate import interp1d
+from .utils import *
 
 
 class ContactPoint(object):
@@ -320,7 +321,7 @@ class ContactPointSampler(object):
         edge_pixel_y, edge_pixel_x = np.where(edge_image == 1)
 
         # edges uv -> xy coordinates
-        pcd = self.depth_to_pcd(depth_image, self.camera_intr)
+        pcd = depth_to_pcd(depth_image, self.camera_intr)
         pcd_w = (np.matmul(self.camera_extr[:3,:3], pcd[:,:3].T) + self.camera_extr[:3,3].reshape(3,1)).T
         
         # edge_list_xy = pcd_w[np.ravel_multi_index((edge_pixel_y, edge_pixel_x), self.depth_image.shape)][:,:2]
@@ -455,8 +456,10 @@ class ContactPointSampler(object):
         
         # Get point cloud of the object only
         depth_image = depth_image * segmask
-        pcd = self.depth_to_pcd(depth_image, camera_intrinsic)
+        pcd = depth_to_pcd(depth_image, camera_intrinsic)
         pcd_object = pcd[np.where(pcd[:,2] > 0.1)[0]]
+        # print(np.max(pcd[:,2]))
+        # print(np.min(pcd[:,2]))
         
         # Transform point cloud to world frame
         pcd_w = (np.matmul(camera_extr[:3,:3], pcd_object[:,:3].T) + camera_extr[:3,3].reshape(3,1)).T
@@ -467,8 +470,9 @@ class ContactPointSampler(object):
         
         threshold_height = 0.01
         # Remove points that are too close to the ground
-        pcd_w = pcd_w[np.where(pcd_w[:,2] > threshold_height)[0]]
-        
+        pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.9)[0]]
+        # print(np.max(pcd[:,2]))
+        # print(np.min(pcd[:,2]))
         
         ##########################################
         # Edge Detection - alpha shape algorithm #
@@ -644,14 +648,3 @@ class ContactPointSampler(object):
         
         return contact_uv_coordinates
     
-    @staticmethod
-    def depth_to_pcd(depth_image, camera_intr):
-        height, width = depth_image.shape
-        row_indices = np.arange(height)
-        col_indices = np.arange(width)
-        pixel_grid = np.meshgrid(col_indices, row_indices)
-        pixels = np.c_[pixel_grid[0].flatten(), pixel_grid[1].flatten()].T
-        pixels_homog = np.r_[pixels, np.ones([1, pixels.shape[1]])]
-        depth_arr = np.tile(depth_image.flatten(), [3, 1])
-        point_cloud = depth_arr * np.linalg.inv(camera_intr).dot(pixels_homog)
-        return point_cloud.transpose()

@@ -7,35 +7,40 @@ simulation:
   compute_device_id: 0
   graphics_device_id: 0
   physics_engine: PHYSX
-  num_iters: 1
-  num_envs: 9
+  num_iters: 3
+  num_envs: 180
   dt: 0.016667
-  camera: ZividTwo
+  camera: IntelRealSenseD415
+  # camera: ZividTwo
 
   # Asset setup
   # slider(dish mesh)
   slider_dataset: urdf
   # slider_name: takeout_cup_65oz
-  slider_name: takeout_cup_16oz
+  # slider_name: bowl_0005
+  # slider_name: melamineware_g_0001
+  slider_name: mug_cup02
+  # slider_name: scan_dish_4
   # Pusher
   pusher_dataset: pusher_urdf
   pusher_name: pusher_vertical
 
   # Push experiment setup
   push_speed: 0.1
-  initial_distance: 0.2
-  translational_push_distance: 0.005 # 0.01
+  initial_distance: 0.1
+  translational_push_distance: 0.01 # 0.01
   gripper_width: 0.08
   gripper_height: 0.02
-  gripper_angle: 0 # 0 ~ 90 [degree]
+  gripper_angle: 90 # 0 ~ 90 [degree]
   rand_height: True
   rand_angle: True
+  env_space: [1.6, 0.8]
 
   # Slider setup
-  slider_rand_position_range: 0.15 # meters 0.05
-  slider_rand_rotation_range: 180 #degrees 180
-  camera_rand_position_range: 0.05 # meters 0.05
-  camera_rand_rotation_range: 10 #degrees 10
+  slider_rand_position_range: [0.4, 0.7] # [%, %]
+  slider_rand_rotation_range: 180 # degrees 180
+  camera_rand_position_range: 0 # meters 0.05
+  camera_rand_rotation_range: 0 #degrees 10
 
   # contact point noise (offset)
   contact_offset_position_range: 0 # meters
@@ -46,13 +51,10 @@ simulation:
   threshold_rot: 7 # degrees 15
 
   # Friction coefficients
-  pusher_friction_coefficient: 0
+  pusher_friction_coefficient: 0.1
 
   min_friction_coefficient: 0.8
   max_friction_coefficient: 1.2
-
-  friction_coefficient: 0.5
-
 
 camera:
   ZividTwo:
@@ -63,7 +65,7 @@ camera:
 
     camera_pose:
       x: -0.67 # meters 
-      z: 0.7 # meters
+      z: 0.95 # meters
       r: 13.5 # deg
 
   AzureKinect:
@@ -106,6 +108,11 @@ camera:
       cy: 373.99615478515625
       
   IntelRealSenseD415:
+    fx: 1783.0662841796875
+    fy: 1782.3050537109375
+    cx: 980
+    cy: 610.2705688476562
+    
     color:
       fx: 1396.8086675255472
       fy: 1406.748094934653
@@ -119,6 +126,11 @@ camera:
       cy: 540
 
     camera_pose:
-      x: -1.0 # meters
-      z: 1.0 # meters
-      r: 30 # deg
+      # x: -1.08 # meters
+      # z: 0.95 # meters
+      # r: 10 # deg
+      x: -0.5 # meters
+      z: 3.5 # meters
+      r: 0 # deg
+      tran: [-1.081072195267972, 0.0030594282850760126, 0.9500685115443778]
+      rot: [0.0032768099437612097, 0.9842047843130775, -0.015359940559485506, 0.17633569484891592]
