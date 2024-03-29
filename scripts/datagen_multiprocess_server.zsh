@@ -1,9 +1,9 @@
 #!/bin/zsh
 
 # Absolute path to the directory where this script is located
-SCRIPT_DIR="/home/jongsoo/catkin_ws/src/stable_push_data_check/scripts"
+SCRIPT_DIR=$(dirname $(readlink -f "$0"))
 # Absolute path to the directory where module is located
-MODULE_DIR="/home/jongsoo/catkin_ws/src/stable_push_data_check"
+MODULE_DIR=$(dirname $SCRIPT_DIR)
 
 # Absolute path to the directory where asset is located (meshes, urdf, pusher_urdf)
 ASSSET_DIR="$MODULE_DIR/assets"
@@ -21,7 +21,7 @@ dish_order=1
 for dish in "${DISH_LIST[@]}"
 do
     echo "#$dish_order / ${#DISH_LIST[*]}"
-    python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
-    # python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
+    python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
+    # python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
     ((dish_order+=1))
 done

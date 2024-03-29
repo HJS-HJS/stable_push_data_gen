@@ -12,19 +12,19 @@ def add_depth_noise(noise_type: str, depth_image: np.array) -> np.array:
     Returns:
         np.array: noisy image
     """
+    row,col= depth_image.shape
 
     if noise_type == "gauss":
-        row,col= depth_image.shape
         mean = 0
         var = 0.000001
         sigma = var**0.5
-        gp_noise = np.random.normal(mean,sigma,(row,col))
+        gp_noise = np.random.normal(mean,sigma,size=(row,col))
         gp_noise = gp_noise.reshape(row,col)
         return depth_image + gp_noise
     
     elif noise_type == "gauss_field":
         gp_noise = np.random.normal(scale=0.007, size=(100, 100))
-        gp_noise = cv2.resize(gp_noise, (1960, 1220))
+        gp_noise = cv2.resize(gp_noise, (col, row))
         gp_noise = gp_noise.astype(np.float32)
         return depth_image + gp_noise
     

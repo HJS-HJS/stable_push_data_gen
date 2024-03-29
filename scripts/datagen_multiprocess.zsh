@@ -21,7 +21,7 @@ dish_order=1
 for dish in "${DISH_LIST[@]}"
 do
     echo "#$dish_order / ${#DISH_LIST[*]}"
-    python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
-    # python3 $SCRIPT_DIR/generate_train_data.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
+    python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
+    # python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
     ((dish_order+=1))
 done

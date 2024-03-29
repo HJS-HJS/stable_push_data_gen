@@ -6,6 +6,7 @@ from tqdm import tqdm
 from utils.push_dof_tools import get_maximum_file_idx
 from utils.dataloader_parallel import DataLoaderParallel
 import parmap
+import multiprocessing
 
 # Parse arguments
 parser = argparse.ArgumentParser(description='This script augment Isaac Gym asset.')
@@ -14,7 +15,7 @@ parser.add_argument('--config_file', required=True, help='Path to urdf folder')
 parser.add_argument('--train_data_dir', required=True, help='Path to urdf folder')
 args = parser.parse_args()
 
-assets_dir = args.urdf_root_dir
+assets_dir = args.urdf_dir
 config_dir = args.config_file
 train_data_dir = args.train_data_dir
 
@@ -22,7 +23,7 @@ train_data_dir = args.train_data_dir
 with open(config_dir,'r') as f:
     cfg = yaml.load(f, Loader=yaml.FullLoader)
 
-num_zero_padding = cfg["FILE_ZERO_PADDING_NUM"]
+num_zero_padding = cfg["simulation"]["FILE_ZERO_PADDING_NUM"]
 
 file_list = os.listdir(train_data_dir)
 file_list = [file for file in file_list if file.endswith('.npy')]
@@ -72,4 +73,5 @@ def save_data(idx):
     with open(os.path.join(train_data_dir, 'label' + name), 'wb') as f:
         np.save(f, labels[idx])
 
-parmap.map(save_data, range(len(flipped_images)), pm_pbar={'desc': 'Saving flipped data'}, pm_processes=16, pm_chunksize=16)
+num_cores = multiprocessing.cpu_count()
+parmap.map(save_data, range(len(flipped_images)), pm_pbar={'desc': 'Saving flipped data'}, pm_processes=num_cores, pm_chunksize=num_cores)

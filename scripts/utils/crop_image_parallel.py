@@ -104,8 +104,7 @@ class CropImageParallel:
         return {env_idx: cropped_image}
         
     def crop_images_parallel(self, depth_images, push_contact_list):
-        cropped_image_with_idx_list= parmap.starmap(self.crop_image_parallel, list(zip(range(self.num_envs), depth_images, push_contact_list)), pm_processes=self.num_cores, pm_chunksize = self.num_cores)
-        #pm_pbar={"desc":"Cropping images..."}
+        cropped_image_with_idx_list= parmap.starmap(self.crop_image_parallel, list(zip(range(self.num_envs), depth_images, push_contact_list)), pm_pbar=True, pm_processes=self.num_cores, pm_chunksize = self.num_cores)
         cropped_image_with_idx_list = sorted(cropped_image_with_idx_list, key=lambda x: list(x.keys())[0])
         cropped_images = [list(cropped_image_with_idx.values())[0] for cropped_image_with_idx in cropped_image_with_idx_list]
         return cropped_images

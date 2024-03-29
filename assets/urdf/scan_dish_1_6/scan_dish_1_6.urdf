@@ -8,13 +8,13 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="/home/jongsoo/catkin_ws/src/stable_push_data_check/assets/urdf//scan_dish_1_6/scan_dish_1_6.stl" scale="1 1 1" />
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_gen/assets/urdf/scan_dish_1_6/scan_dish_1_6.stl" scale="1 1 1" />
       </geometry>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="/home/jongsoo/catkin_ws/src/stable_push_data_check/assets/urdf//scan_dish_1_6/scan_dish_1_6.stl" scale="1 1 1" />
+        <mesh filename="/home/rise/catkin_ws/src/stable_push_data_gen/assets/urdf/scan_dish_1_6/scan_dish_1_6.stl" scale="1 1 1" />
       </geometry>
     </collision>
   </link>

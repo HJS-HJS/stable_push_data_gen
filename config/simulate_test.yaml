@@ -1,6 +1,6 @@
 simulation:
   # simulation environment setup
-  num_threads : 8
+  num_threads : 12
   FILE_ZERO_PADDING_NUM: 7
   use_gpu: True
   use_gpu_pipeline : False
@@ -108,10 +108,14 @@ camera:
       cy: 373.99615478515625
       
   IntelRealSenseD415:
-    fx: 1783.0662841796875
-    fy: 1782.3050537109375
-    cx: 980
-    cy: 610.2705688476562
+    # fx: 1783.0662841796875
+    # fy: 1782.3050537109375
+    # cx: 980
+    # cy: 610.2705688476562
+    fx: 1367.0645751953125
+    fy: 1365.3912353515625
+    cx: 974.408203125
+    cy: 528.857666015625
     
     color:
       fx: 1396.8086675255472
