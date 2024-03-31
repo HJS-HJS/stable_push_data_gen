@@ -599,7 +599,7 @@ class PushSim(object):
         push_contact_list = []
 
 #############################################################################################
-                    # vis
+                    # temp
 #############################################################################################
         # fig = plt.figure(figsize=(10,10))
         # col = int(np.ceil(np.sqrt(self.num_envs)))
@@ -623,14 +623,34 @@ class PushSim(object):
         # _temp_img = depth_images[0] * segmasks[0]
 
         # fig = plt.figure()
+        # ax = fig.add_subplot(1,2,1)
+        # ax.imshow(depth_images[0])
+        # ax2 = fig.add_subplot(1,2,2)
+        # ax2.imshow(depth_noise_images[0])
+        # plt.show()
+
+        # fig = plt.figure()
         # ax = fig.add_subplot(111, projection='3d')
-        # # pcd = depth_to_pcd(depth_images[0], self.camera_intrinsic)
-        # pcd = depth_to_pcd(_temp_img, self.camera_intrinsic)
+        # _temp = depth_images[0] * segmasks[0]
+        # pcd = depth_to_pcd(_temp, self.camera_intrinsic)
         # pcd_object = pcd[np.where(pcd[:,2] > 0.1)[0]]
         # pcd_w = (np.matmul(self.camera_poses[0][:3,:3], pcd_object[:,:3].T) + self.camera_poses[0][:3,3].reshape(3,1)).T
-        # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.9)[0]]
+        # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.8)[0]]
+        # # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.1)[0]]
         # print(np.max(pcd_w[:,2]))
         # ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
+        # plt.show()
+
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111, projection='3d')
+        # _temp = depth_noise_images[0] * segmasks[0]
+        # pcd = depth_to_pcd(_temp, self.camera_intrinsic)
+        # pcd_object = pcd[np.where(pcd[:,2] > 0.1)[0]]
+        # pcd_w = (np.matmul(self.camera_poses[0][:3,:3], pcd_object[:,:3].T) + self.camera_poses[0][:3,3].reshape(3,1)).T
+        # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.8)[0]]
+        # # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.1)[0]]
+        # print(np.max(pcd_w[:,2]))
+        # ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])        
         # plt.show()
 
 #############################################################################################
@@ -729,6 +749,12 @@ class PushSim(object):
                         np.save(f, cropped_segmask * cropped_depth_img)
                         
                 self.image_idx += 1
+            fig = plt.figure(figsize=(10,10))
+            col = int(np.ceil(np.sqrt(self.num_envs)))
+            for i in range(self.num_envs):
+                ax = fig.add_subplot(col,col,i+1)
+                ax.imshow(cropped_segmasks[i])
+            plt.show()
                     
         print('Save network inputs from ', self.init_file_idx + 1, 'to ', self.image_idx)
         return push_contact_list
@@ -816,6 +842,7 @@ class PushSim(object):
                     
                 self.velocity_and_label_idx += 1
             print('Save velocity, label from ', self.init_file_idx + 1, 'to ', self.velocity_and_label_idx)
+            print(labels)
 
     def get_camera_image(self):
         """Get images from camera
@@ -983,13 +1010,7 @@ class PushSim(object):
 
         for waypoint_idx, waypoint in enumerate(waypoints):
             for env_idx in range(self.num_envs):
-                # print(self.gym.get_actor_dof_names(self.envs[env_idx], self.pusher_actor_handles[env_idx]))
-                # self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], np.array([0, 0, 0, 0, -0.02, -0.02]).astype(np.float32))
                 self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], np.concatenate((np.append(waypoint[env_idx], self.contact_angles[env_idx]), _width)).astype(np.float32))
-                # self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], np.concatenate((waypoint[env_idx], self.contact_angles[env_idx], _width)).astype(np.float32))
-                # self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], np.append(waypoint[env_idx], self.contact_angles[env_idx]).astype(np.float32))
-                # self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], np.append(waypoint[env_idx], self.contact_angles[env_idx], _width).astype(np.float32))
-                # self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], np.append(waypoint[env_idx], self.contact_angles[env_idx], self._gripper_width_change/2, self._gripper_width_change/2).astype(np.float32))
                     
             # Step the physics
             self.gym.simulate(self.sim)

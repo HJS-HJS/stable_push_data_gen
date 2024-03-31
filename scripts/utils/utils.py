@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import cv2
 
 def add_depth_noise(noise_type: str, depth_image: np.array) -> np.array:
-    """_summary_
+    """add noise in depth image
 
     Args:
-        noise_type (str): gauss, gauss_field
+        noise_type (str): Kind of filter (gauss, gauss_field)
         depth_image (np.array): input depth image
 
     Returns:
@@ -33,10 +33,10 @@ def add_depth_noise(noise_type: str, depth_image: np.array) -> np.array:
         return depth_image
 
 def add_pcd_noise(noise_type: str, pcd: np.array) -> np.array:
-    """_summary_
+    """add noise in pointcloud data
 
     Args:
-        noise_type (str): gauss, sin
+        noise_type (str): Kind of filter (gauss, sin)
         depth_image (np.array): input depth image
 
     Returns:
@@ -66,7 +66,16 @@ def add_pcd_noise(noise_type: str, pcd: np.array) -> np.array:
         print("[ PCD Noise Filter ]: Invalide noise type")
         return pcd
 
-def depth_to_pcd(depth_image, camera_intr):
+def depth_to_pcd(depth_image: np.array, camera_intr: np.array) ->np.array:
+    """_summary_
+
+    Args:
+        depth_image (np.array): depth image
+        camera_intr (np.array): camera intrinsic
+
+    Returns:
+        np.array: pointcloud data array converted from depth image
+    """
     height, width = depth_image.shape
     row_indices = np.arange(height)
     col_indices = np.arange(width)
