@@ -2,7 +2,7 @@ import os
 import re
 import numpy as np
 import matplotlib.pyplot as plt
-from utils.dataloader_parallel import DataLoaderParallel
+from dataloader_parallel import DataLoaderParallel
 
 '''
 Derives mean and standard deviation values from train data.
