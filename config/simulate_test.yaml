@@ -33,7 +33,8 @@ simulation:
   gripper_height: 0.02
   # gripper_height_max: 0.08
   gripper_angle: 90 # 0 ~ 90 [degree]
-  rand_height: False
+  rand_height: True
+  # rand_height: False
   rand_angle: True
   env_space: [1.6, 0.8]
 
