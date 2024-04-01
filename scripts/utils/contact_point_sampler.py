@@ -470,6 +470,7 @@ class ContactPointSampler(object):
         
         threshold_height = 0.01
         # Remove points that are too close to the ground
+        # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.8)[0]]
         pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.8)[0]]
         # print(np.max(pcd[:,2]))
         # print(np.min(pcd[:,2]))

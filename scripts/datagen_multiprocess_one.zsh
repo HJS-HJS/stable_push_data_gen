@@ -21,7 +21,7 @@ do
     # if [ $dish = 'takeout_cup_65oz' ] ; then
     if [ $dish = 'mug_cup02' ] ; then
         sudo pkill python3
-        python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
-        # python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
+        # python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
+        python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
     fi
 done

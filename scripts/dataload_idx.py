@@ -37,7 +37,6 @@ test_indices = np.array(indices[int(maximum_number*0.8):])
 
 plot_indices  = np.arange(maximum_number)
 
-
 with open (save_dir + "/train_indices.npy","wb") as f:
     np.save(f,train_indices)
 with open (save_dir + "/val_indices.npy","wb") as f:

@@ -35,6 +35,7 @@ class PushSim(object):
         parser.add_argument('--config', type=str, default="/home/rise/catkin_ws/src/stable-pushnet-datagen/config/config_pushsim.yaml", help='Configuration file')
         parser.add_argument('--asset_dir', type=str, help='Directory of asset folder')
         parser.add_argument('--headless', type=bool, default=False, help='Turn on the viewer')
+        # parser.add_argument('--headless', type=bool, default=True, help='Turn on the viewer')
         parser.add_argument('--save_results', action='store_true', help='save results')
         parser.add_argument('--slider_name', type=str, help='Slider Name')
         self.args = parser.parse_args()
@@ -93,7 +94,7 @@ class PushSim(object):
         # Gripper height
         self.gripper_height = sim_cfg["gripper_height"]
         # Gripper height
-        self.gripper_angle = np.deg2rad(sim_cfg["gripper_angle"] - 90)
+        self.gripper_angle = np.deg2rad(sim_cfg["gripper_angle"] - 90) # (-90 ~ 0)
         # Gripper height
         self.rand_height = sim_cfg["rand_height"]
         # Gripper height
@@ -749,12 +750,13 @@ class PushSim(object):
                         np.save(f, cropped_segmask * cropped_depth_img)
                         
                 self.image_idx += 1
-            fig = plt.figure(figsize=(10,10))
-            col = int(np.ceil(np.sqrt(self.num_envs)))
-            for i in range(self.num_envs):
-                ax = fig.add_subplot(col,col,i+1)
-                ax.imshow(cropped_segmasks[i])
-            plt.show()
+
+            # fig = plt.figure(figsize=(10,10))
+            # col = int(np.ceil(np.sqrt(self.num_envs)))
+            # for i in range(self.num_envs):
+            #     ax = fig.add_subplot(col,col,i+1)
+            #     ax.imshow(cropped_segmasks[i] * cropped_depth_images[i])
+            # plt.show()
                     
         print('Save network inputs from ', self.init_file_idx + 1, 'to ', self.image_idx)
         return push_contact_list
@@ -834,7 +836,8 @@ class PushSim(object):
                 
                 # Save each pushing direction (network input)
                 with open(os.path.join(self.save_dir, 'velocity' + name), 'wb') as f:
-                    np.save(f, np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], self.contact_angles[env_idx]]))
+                    np.save(f, np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
+                    # print(np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
 
                 # Save each label (network output)
                 with open(os.path.join(self.save_dir, 'label' + name), 'wb') as f:

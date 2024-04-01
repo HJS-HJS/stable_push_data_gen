@@ -54,9 +54,10 @@ labels = np.array(label_list)
 # Flip train data
 flipped_images = np.flip(images, axis=2)
 flipped_masked_images = np.flip(masked_images, axis=2)
-flipped_velocities = -velocities # flip velocity
-flipped_velocities[:,0] *= -1 # keep x velocity the same
-
+# flipped_velocities = -velocities # flip velocity
+flipped_velocities = velocities # flip velocity
+# flipped_velocities[:,0] *= -1 # keep x velocity the same
+flipped_velocities[:,0] = -1.0001 * flipped_velocities[:,0] # keep x velocity the same
 
 def save_data(idx):
     name = ("_%0" + str(num_zero_padding) + 'd.npy')%(data_max_idx + idx + 1)
@@ -68,7 +69,7 @@ def save_data(idx):
         np.save(f, flipped_masked_images[idx])
         
     with open(os.path.join(train_data_dir, 'velocity' + name), 'wb') as f:
-        np.save(f, flipped_velocities[idx])
+        np.save(f, np.array([-velocities[idx][0], velocities[idx][1], velocities[idx][2]]))
         
     with open(os.path.join(train_data_dir, 'label' + name), 'wb') as f:
         np.save(f, labels[idx])
