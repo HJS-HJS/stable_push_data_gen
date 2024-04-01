@@ -10,12 +10,10 @@ import multiprocessing
 
 # Parse arguments
 parser = argparse.ArgumentParser(description='This script augment Isaac Gym asset.')
-parser.add_argument('--urdf_dir', required=True, help='Path to mesh folder')
 parser.add_argument('--config_file', required=True, help='Path to urdf folder')
 parser.add_argument('--train_data_dir', required=True, help='Path to urdf folder')
 args = parser.parse_args()
 
-assets_dir = args.urdf_dir
 config_dir = args.config_file
 train_data_dir = args.train_data_dir
 
@@ -54,10 +52,8 @@ labels = np.array(label_list)
 # Flip train data
 flipped_images = np.flip(images, axis=2)
 flipped_masked_images = np.flip(masked_images, axis=2)
-# flipped_velocities = -velocities # flip velocity
-flipped_velocities = velocities # flip velocity
-# flipped_velocities[:,0] *= -1 # keep x velocity the same
-flipped_velocities[:,0] = -1.0001 * flipped_velocities[:,0] # keep x velocity the same
+
+print(data_max_idx)
 
 def save_data(idx):
     name = ("_%0" + str(num_zero_padding) + 'd.npy')%(data_max_idx + idx + 1)
@@ -76,3 +72,4 @@ def save_data(idx):
 
 num_cores = multiprocessing.cpu_count()
 parmap.map(save_data, range(len(flipped_images)), pm_pbar={'desc': 'Saving flipped data'}, pm_processes=num_cores, pm_chunksize=num_cores)
+print('convert ', len(flipped_images), 'data')
