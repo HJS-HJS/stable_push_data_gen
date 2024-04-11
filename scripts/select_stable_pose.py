@@ -29,9 +29,9 @@ class SelectStablePose(object):
         for object in self.objects:
             self.current_object = object
             self.check_for_object()
-            # if a % 11 == 0:
-                # self.check_for_object()
-            # a += 1
+            if a % 11 == 0:
+                self.check_for_object()
+            a += 1
 
     def check_for_object(self):
         self.is_modified = False
@@ -53,8 +53,8 @@ class SelectStablePose(object):
         # Case where there is only one stable pose        
         if len(self.stable_poses.shape) == 2:
             pass
-            # self.current_pose = self.stable_poses
-            # self.visualize_in_given_pose()
+            self.current_pose = self.stable_poses
+            self.visualize_in_given_pose()
                 
     def visualize_in_given_pose(self) :
         

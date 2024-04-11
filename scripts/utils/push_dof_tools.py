@@ -53,7 +53,8 @@ def linear_velocities(samples: int=2000) -> List[Union[float, float, float]]:
     """
 
     # log_radius = np.linspace(np.log10(1e-4), np.log10(100), samples)
-    log_radius = np.linspace(np.log10(1e-2), np.log10(10), samples)
+    # log_radius = np.linspace(np.log10(1e-2), np.log10(10), samples)
+    log_radius = np.linspace(np.log10(1e-1), np.log10(10), samples)
     radius_positive = np.power(10, log_radius)
     radius = np.concatenate((np.flip(-radius_positive), radius_positive))
     icrs = np.vstack((radius, np.zeros_like(radius), np.ones_like(radius))).T
@@ -223,7 +224,6 @@ def icrs2trajectories(icrs, approach_distance, push_speed, dt):
         
         # Start of this trajectory == end of approach trajectory
         x += approach_distance
-        
         joint_trajectory = np.vstack((x,y,theta-alpha)).T
         joint_trajectories.append(joint_trajectory)
         

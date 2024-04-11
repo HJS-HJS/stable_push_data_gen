@@ -211,19 +211,21 @@ class ContactPointSampler(object):
         sorted_indices = np.argsort(contact_pair_angles)
 
         if sorted_indices.shape[0] < self.num_push_dirs:
-            raise Exception(f'Error: number of contact points is less than {self.num_push_dirs}')
-
-        sorted_indices = []
-        for i in range(self.num_push_dirs):
-            sorted_indices.append(np.argmin(abs(contact_pair_angles - i / self.num_push_dirs * 360)))
-            
+            # raise Exception(f'Error: number of contact points is less than {self.num_push_dirs}')
+            sorted_idx = []
+            for i in range(sorted_indices.shape[0]):
+                sorted_idx.append(np.argmin(abs(contact_pair_angles - i / sorted_indices.shape[0] * 360)))
+        else:
+            sorted_idx = []
+            for i in range(self.num_push_dirs):
+                sorted_idx.append(np.argmin(abs(contact_pair_angles - i / self.num_push_dirs * 360)))
         contact_points = []
         
-        # for idx in sorted_indices:
-        for idx in sorted_indices:
-            
+        np.random.shuffle(sorted_idx)
+        for idx in sorted_idx:
             contact_points.append(ContactPoint(edge_list_xyz, edge_list_uv, contact_pair_xyz[idx], contact_pair_uv[idx], pushing_directions[idx]))
-            
+        np.random.shuffle(contact_points)
+        
         return contact_points
         
     def edge_detection(self, depth_image, segmask):
@@ -327,8 +329,6 @@ class ContactPointSampler(object):
         # edge_list_xy = pcd_w[np.ravel_multi_index((edge_pixel_y, edge_pixel_x), self.depth_image.shape)][:,:2]
         edge_list_xyz = pcd_w[np.ravel_multi_index((edge_pixel_y, edge_pixel_x), self.depth_image.shape)]
         edge_list_uv = np.c_[edge_pixel_y, edge_pixel_x]
-        
-        
         
         
         #######################
@@ -457,9 +457,9 @@ class ContactPointSampler(object):
         # Get point cloud of the object only
         depth_image = depth_image * segmask
         pcd = depth_to_pcd(depth_image, camera_intrinsic)
-        pcd_object = pcd[np.where(pcd[:,2] > 0.1)[0]]
-        # print(np.max(pcd[:,2]))
-        # print(np.min(pcd[:,2]))
+        # pcd_object = pcd[np.where(pcd[:,2] > 0.1)[0]]
+        # pcd_object = pcd[np.arange(1,pcd.shape[0],10)]
+        pcd_object = pcd
         
         # Transform point cloud to world frame
         pcd_w = (np.matmul(camera_extr[:3,:3], pcd_object[:,:3].T) + camera_extr[:3,3].reshape(3,1)).T
@@ -468,13 +468,16 @@ class ContactPointSampler(object):
         #  Height Thresholding ##
         #########################
         
-        threshold_height = 0.01
-        # Remove points that are too close to the ground
-        # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.8)[0]]
-        pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.8)[0]]
-        # print(np.max(pcd[:,2]))
-        # print(np.min(pcd[:,2]))
+        max_height = np.max(pcd_w[:,2]) - (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.1
+        pcd_w = pcd_w[np.where(pcd_w[:,2] < max_height)[0]]
+        min_height = np.min(pcd_w[:,2]) + (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.2
+        pcd_w = pcd_w[np.where(pcd_w[:,2] > min_height)[0]]
         
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111, projection='3d')
+        # ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
+        # plt.show()
+
         ##########################################
         # Edge Detection - alpha shape algorithm #
         ##########################################

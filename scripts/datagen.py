@@ -5,7 +5,7 @@ import yaml
 import argparse
 
 # import isaacgym modules
-from isaacgym import gymapi
+from isaacgym import gymapi, terrain_utils
 
 # import 3rd party modules
 import numpy as np
@@ -18,6 +18,7 @@ from utils.crop_image_parallel import CropImageParallel
 from utils.sample_push_contact_parallel import SamplePushContactParallel
 from utils.push_dof_tools import *
 from utils.utils import *
+from utils.ir_pattern import IRPattern
 
 class PushSim(object):
     def __init__(self):
@@ -45,6 +46,7 @@ class PushSim(object):
         self.gym.prepare_sim(self.sim) # Prepare simulation with buffer allocations
         self._create_ground()
         self._create_viewer()
+        self._create_light()
         self._create_environments()
         
     def _load_configuration(self):
@@ -122,16 +124,33 @@ class PushSim(object):
         self.camera_rand_position_range = sim_cfg["camera_rand_position_range"]
         self.camera_rand_rotation_range = sim_cfg["camera_rand_rotation_range"]
         
-        self.camera_default_length = cam_cfg['camera_pose']['x']
-        self.camera_default_height = cam_cfg['camera_pose']['z']
-        self.camera_default_angle = cam_cfg['camera_pose']['r']
+        # self.camera_default_length = cam_cfg['camera_pose']['x']
+        # self.camera_default_height = cam_cfg['camera_pose']['z']
+        # self.camera_default_angle = cam_cfg['camera_pose']['r']
                 
         # camera pose
         self.cam_pose = gymapi.Transform()
-        self.cam_pose.p = gymapi.Vec3(cam_cfg['camera_pose']['tran'][0], cam_cfg['camera_pose']['tran'][1], cam_cfg['camera_pose']['tran'][2])
-        _rot = gymapi.Quat(cam_cfg['camera_pose']['rot'][0], cam_cfg['camera_pose']['rot'][1], cam_cfg['camera_pose']['rot'][2], cam_cfg['camera_pose']['rot'][3]).to_euler_zyx()
-        self.cam_pose.r = gymapi.Quat.from_euler_zyx(-np.pi / 2 + _rot[0], np.pi / 2 - _rot[1], np.pi - _rot[2])
+        # self.cam_pose.p = gymapi.Vec3(cam_cfg['camera_pose']['tran'][0], cam_cfg['camera_pose']['tran'][1], cam_cfg['camera_pose']['tran'][2])
+            
+        if len(cam_cfg['camera_pose']['rot']) == 3:
+            pass
+            self.cam_pose.r = gymapi.Quat.from_euler_zyx(np.pi / 2 - cam_cfg['camera_pose']['rot'][2], -np.pi / 2 - cam_cfg['camera_pose']['rot'][1], cam_cfg['camera_pose']['rot'][0])
+        elif len(cam_cfg['camera_pose']['rot']) == 4:
+            _rot = gymapi.Quat(cam_cfg['camera_pose']['rot'][0], cam_cfg['camera_pose']['rot'][1], cam_cfg['camera_pose']['rot'][2], cam_cfg['camera_pose']['rot'][3]).to_euler_zyx()
+            self.cam_pose.r = gymapi.Quat.from_euler_zyx(-np.pi / 2 + _rot[2], np.pi / 2 - _rot[1], np.pi - _rot[0])
+        else:
+            raise
 
+        self.cam_matrix = np.array(cam_cfg['camera_pose']['matrix']).reshape(4,4)
+
+        rot = self.cam_matrix[:3,:3]
+        # convert y = -x, z = -y, x = z
+        rot_convert = np.array([[0,-1,0], [0,0,-1], [1,0,0]])
+        rot = np.dot(rot,rot_convert)
+        _quat = R.from_matrix(rot).as_quat()
+        self.cam_pose.r = gymapi.Quat(_quat[0], _quat[1], _quat[2], _quat[3])
+        self.cam_pose.p = gymapi.Vec3(self.cam_matrix[0,3], self.cam_matrix[1,3], self.cam_matrix[2,3])
+   
         # Slider's stable pose
         stable_pose = np.load("{}/{}/{}/stable_poses.npy".format(self.asset_dir, self.slider_dataset_name, self.slider_name))
         self.slider_default_pose = stable_pose
@@ -148,7 +167,9 @@ class PushSim(object):
 
         quat = R.from_matrix(stable_pose[:3,:3]).as_quat()
         self.slider_stable_pose = gymapi.Transform()
-        self.slider_stable_pose.p = gymapi.Vec3(-self.env_space[0]/2, 0, stable_pose[2,3])
+        self.slider_stable_pose.p = gymapi.Vec3(-self.env_space[0]/2 + sim_cfg["slider_rand_position_offset"][0], 
+                                                sim_cfg["slider_rand_position_offset"][1], 
+                                                stable_pose[2,3])
         self.slider_stable_pose.r = gymapi.Quat(quat[0], quat[1], quat[2], quat[3])
         
         # Random slider pose
@@ -216,6 +237,11 @@ class PushSim(object):
 
         # Create ground
         self.gym.add_ground(self.sim, plane_params)
+
+        # heightfield = np.zeros((num_terains*num_rows, num_cols), dtype=np.int16)
+        # vertices, triangles = terrain_utils.convert_heightfield_to_trimesh(heightfield, horizontal_scale=horizontal_scale, vertical_scale=vertical_scale, slope_threshold=1.5)
+        # self.gym.add_triangle_mesh(self.sim, vertices.flatten(), triangles.flatten(), tm_params)
+
         
     def _create_viewer(self):
         ''' Create viewer '''
@@ -238,6 +264,15 @@ class PushSim(object):
             if self.viewer is None:
                 print("*** Failed to create viewer")
                 quit()
+
+    def _create_light(self):
+        ''' Create Lights '''
+        self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0.0, 0.0, 0.0), gymapi.Vec3(0, 0, 0), gymapi.Vec3(-1, -2, 0.1))
+        # self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0, 0, 0), gymapi.Vec3(1, 1, 1), gymapi.Vec3(0, 0, 10))
+        # self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0.1, 0.1, 0.1), gymapi.Vec3(0, 0, 0), gymapi.Vec3(0, 0, 10))
+        # self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0.1, 0.1, 0), gymapi.Vec3(0, 0, 0), gymapi.Vec3(0, 0, 0))
+        # self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0.1, 0.1, 0.1), gymapi.Vec3(0, 0, 0), gymapi.Vec3(1, 2, 0.1))
+
     
     def _create_environments(self):
         ''' Create environments with pusher, slider, and pusher-attached camera'''
@@ -270,6 +305,7 @@ class PushSim(object):
         self.slider_actor_handles = []
         self.pusher_actor_handles = []
         self.camera_handles = []
+        self.camera_handles_l = []
         self.contact_angles = []
         self.contact_heights = []
         
@@ -284,7 +320,8 @@ class PushSim(object):
             pusher_actor_handle = self.gym.create_actor(env, pusher_asset, pusher_pose, pusher_name, env_idx, segmentationId=0)
             
             # set visual property
-            self.gym.set_rigid_body_color(env, slider_actor_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(0., 1., 0.))
+            self.gym.set_rigid_body_color(env, slider_actor_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(0.1, 0.1, 0.1))
+            # self.gym.set_rigid_body_color(env, slider_actor_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(1, 1, 1))
             # Color left finger
             self.gym.set_rigid_body_color(env, pusher_actor_handle, 5, gymapi.MESH_VISUAL, gymapi.Vec3(1., 0., 1.))
             # Color right finger
@@ -300,6 +337,7 @@ class PushSim(object):
             
             # Create camera sensors
             camera_handle = self.create_camera_sensors(env)
+            camera_handle_assis = self.create_camera_sensors(env)
             
             # Set slider friction coefficient randomly
             rand_friction = self.friction_coefficients[np.random.randint(0, len(self.friction_coefficients))]
@@ -321,6 +359,7 @@ class PushSim(object):
             self.slider_actor_handles.append(slider_actor_handle)
             self.pusher_actor_handles.append(pusher_actor_handle)
             self.camera_handles.append(camera_handle)      
+            self.camera_handles_l.append(camera_handle_assis)      
             
             if not self.headless:
                 self.gym.draw_viewer(self.viewer, self.sim, False)
@@ -440,6 +479,9 @@ class PushSim(object):
         camera_props.width = int(self.camera_intrinsic[0,2] * 2.0)
         camera_props.height = int(self.camera_intrinsic[1,2] * 2.0)
         camera_props.horizontal_fov = 2*np.arctan2(self.camera_intrinsic[0,2], self.camera_intrinsic[0,0]) * 180/np.pi
+        # print(camera_props.horizontal_fov)
+        camera_props.horizontal_fov = 69.4
+        # camera_props.horizontal_fov = 85
         camera_props.far_plane = 1
         camera_handle  = self.gym.create_camera_sensor(env,camera_props)
         
@@ -459,6 +501,7 @@ class PushSim(object):
         # Default camera pose
         p_stable = self.cam_pose.p
         q_stable = self.cam_pose.r
+        assis = gymapi.Vec3(0, -0.055, 0)
         
         for env_idx in range(self.num_envs):
             # Get random camera pose
@@ -472,9 +515,13 @@ class PushSim(object):
             p = q_random.rotate(p_stable) + p_random
             q = (q_random*q_stable).normalize()
             cam_pose = gymapi.Transform(p, q)
+            # cam_pose = gymapi.Transform(p_stable, q_stable)
+            cam_pose_assis = gymapi.Transform(p + q_stable.rotate(assis), q)
+            # cam_pose_assis = gymapi.Transform(p_stable + q_stable.rotate(assis), q_stable)
             
             # Reset camera pose
             self.gym.set_camera_transform(self.camera_handles[env_idx],self.envs[env_idx],cam_pose)
+            self.gym.set_camera_transform(self.camera_handles_l[env_idx],self.envs[env_idx],cam_pose_assis)
             
             # Get camera extrinsic matrix
             # convert z = x, x = -y, y = -z
@@ -482,8 +529,8 @@ class PushSim(object):
             rot_convert = np.array([[0,0,1], [-1,0,0], [0,-1,0]])
             rot = np.dot(rot,rot_convert)
             camera_extr = np.eye(4)
-            camera_extr[:3,:3] = rot
             camera_extr[:3,3] = np.array([cam_pose.p.x, cam_pose.p.y, cam_pose.p.z])
+            camera_extr[:3,:3] = rot
             
             reset_camera_poses.append(camera_extr)
             
@@ -529,7 +576,7 @@ class PushSim(object):
             # Reset pusher pose (to default)
             pusher_pose = gymapi.Transform()
             # pusher_pose.p = gymapi.Vec3(0, 0, -2)
-            pusher_pose.p = gymapi.Vec3(0, 0, 2)
+            pusher_pose.p = gymapi.Vec3(0,0,2)
             pusher_pose.r = gymapi.Quat(0,0,0,1)
             
             pusher_rigid_body_handle = self.gym.find_actor_rigid_body_handle(self.envs[env_idx], self.pusher_actor_handles[env_idx], "base_link")
@@ -539,6 +586,7 @@ class PushSim(object):
             
             # Reset pusher DOF states to zero
             self.gym.set_actor_dof_states(self.envs[env_idx], self.pusher_actor_handles[env_idx], self.default_pusher_dof_state, gymapi.STATE_ALL)
+
             
     def step_simulation(self):
         ''' Step the simulation '''
@@ -596,62 +644,39 @@ class PushSim(object):
         self.gym.draw_viewer(self.viewer, self.sim, True)
 
         # get images
-        depth_images, depth_noise_images, segmasks = self.get_camera_image()
+        depth_images, ir_depth_images, segmasks = self.get_camera_image()
         push_contact_list = []
 
 #############################################################################################
-                    # temp
+                    # vis
 #############################################################################################
-        # fig = plt.figure(figsize=(10,10))
-        # col = int(np.ceil(np.sqrt(self.num_envs)))
-        # for i in range(self.num_envs):
-        #     ax = fig.add_subplot(col,col,i+1)
-        #     ax.imshow(depth_noise_images[i])
-        # plt.show()
+
 
         # fig = plt.figure(figsize=(10,10))
         # col = int(np.ceil(np.sqrt(self.num_envs)))
         # for i in range(self.num_envs):
-        #     ax = fig.add_subplot(col,col,i+1)
-        #     ax.imshow(segmasks[i])
+        #     ax = fig.add_subplot(col * 2,col,3 * i + 1)
+        #     ax.imshow(depth_images[i])
+        #     ax = fig.add_subplot(col * 2,col,3 * i + 2)
+        #     ax.imshow(ir_depth_images[i])
+        #     ax2 = fig.add_subplot(col * 2,col,3 * i + 3)
+        #     ax2.imshow(segmasks[i])
         # plt.show()
-        
+
         # fig = plt.figure(figsize=(10,10))
+        # col = int(np.ceil(np.sqrt(self.num_envs)))
         # for i in range(self.num_envs):
-        #     ax = fig.add_subplot(col,col,i+1)
-        #     ax.imshow(segmasks[i])
-        # plt.show()
-        # _temp_img = depth_images[0] * segmasks[0]
-
-        # fig = plt.figure()
-        # ax = fig.add_subplot(1,2,1)
-        # ax.imshow(depth_images[0])
-        # ax2 = fig.add_subplot(1,2,2)
-        # ax2.imshow(depth_noise_images[0])
-        # plt.show()
-
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111, projection='3d')
-        # _temp = depth_images[0] * segmasks[0]
-        # pcd = depth_to_pcd(_temp, self.camera_intrinsic)
-        # pcd_object = pcd[np.where(pcd[:,2] > 0.1)[0]]
-        # pcd_w = (np.matmul(self.camera_poses[0][:3,:3], pcd_object[:,:3].T) + self.camera_poses[0][:3,3].reshape(3,1)).T
-        # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.8)[0]]
-        # # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.1)[0]]
-        # print(np.max(pcd_w[:,2]))
-        # ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
-        # plt.show()
-
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111, projection='3d')
-        # _temp = depth_noise_images[0] * segmasks[0]
-        # pcd = depth_to_pcd(_temp, self.camera_intrinsic)
-        # pcd_object = pcd[np.where(pcd[:,2] > 0.1)[0]]
-        # pcd_w = (np.matmul(self.camera_poses[0][:3,:3], pcd_object[:,:3].T) + self.camera_poses[0][:3,3].reshape(3,1)).T
-        # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.8)[0]]
-        # # pcd_w = pcd_w[np.where(pcd_w[:,2] > np.max(pcd_w[:,2]) * 0.1)[0]]
-        # print(np.max(pcd_w[:,2]))
-        # ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])        
+        #     pcd = depth_to_pcd(depth_images[i] * segmasks[i], self.camera_intrinsic)
+        #     pcd_object = pcd[np.arange(1,pcd.shape[0],20)]
+        #     rot = self.camera_poses[0][:3,:3]
+        #     # r = R.from_matrix(rot).as_euler('zyx', degrees=True)
+        #     # r[1] -= 0.4
+        #     # rot = R.from_euler('zyx',r, degrees=True).as_matrix()
+        #     pcd_w = (np.matmul(rot, pcd_object[:,:3].T) + self.camera_poses[0][:3,3].reshape(3,1)).T
+        #     max_height = np.max(pcd_w[:,2]) - (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.3
+        #     pcd_w = pcd_w[np.where(pcd_w[:,2] < max_height)[0]]
+        #     ax = fig.add_subplot(col,col,i + 1, projection='3d')
+        #     ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
         # plt.show()
 
 #############################################################################################
@@ -676,11 +701,45 @@ class PushSim(object):
         # contact_point = push_contact.contact_points_uv[0]
         # fig = plt.figure()
         # ax = fig.add_subplot(111)
-        # ax.imshow(depth_noise_images[0])
+        # ax.imshow(depth_images[0])
         # ax.scatter(contact_point[0], contact_point[1], color='r')
         # ax.scatter(edge_list_uv[:,0], edge_list_uv[:,1], color='b')
         # plt.show()
         
+        # fig = plt.figure(figsize=(10,10))
+        # col = int(np.ceil(np.sqrt(self.num_envs)))
+        # for i in range(self.num_envs):
+        #     pcd = depth_to_pcd(depth_images[i] * segmasks[i], self.camera_intrinsic)
+        #     pcd_object = pcd[np.arange(1,pcd.shape[0],2)]
+        #     rot = self.camera_poses[0][:3,:3]
+        #     # r = R.from_matrix(rot).as_euler('zyx', degrees=True)
+        #     # r[1] -= 0.4
+        #     # rot = R.from_euler('zyx',r, degrees=True).as_matrix()
+        #     pcd_w = (np.matmul(rot, pcd_object[:,:3].T) + self.camera_poses[0][:3,3].reshape(3,1)).T
+        #     max_height = np.max(pcd_w[:,2]) - (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.1
+        #     pcd_w = pcd_w[np.where(pcd_w[:,2] < max_height)[0]]
+        #     min_height = np.min(pcd_w[:,2]) + (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.2
+        #     pcd_w = pcd_w[np.where(pcd_w[:,2] > min_height)[0]]
+        #     ax = fig.add_subplot(col * 4,col,4 * i + 1, projection='3d')
+        #     ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
+
+        #     ax = fig.add_subplot(col * 4,col,4 * i + 2)
+        #     pcd_w_2d = pcd_w[:,:2]
+        #     ax.scatter(pcd_w_2d[:, 0], pcd_w_2d[:, 1], color='b')
+        
+        #     push_contact = push_contact_list[i]
+        #     if push_contact is not None:
+        #         edge_list_uv = push_contact.edge_uv
+        #         contact_point = push_contact.contact_points_uv[0]
+        #         ax = fig.add_subplot(col * 4,col,4 * i + 3)
+        #         ax.imshow(depth_images[i])
+        #         ax.scatter(contact_point[0], contact_point[1], color='r')
+        #         ax.scatter(edge_list_uv[:,0], edge_list_uv[:,1], color='b')
+
+        #     ax = fig.add_subplot(col * 4,col,4 * i + 4)
+        #     ax.imshow(segmasks[i])
+        # plt.show()
+
         # ################################
         # # Debugging for function speed #
         # ################################
@@ -727,9 +786,8 @@ class PushSim(object):
         if self.save_results:
             
             print("Saving network inputs...")
-            cropped_depth_images = ci.crop_images_parallel(depth_noise_images, push_contact_list)
+            cropped_depth_images = ci.crop_images_parallel(ir_depth_images, push_contact_list)
             cropped_segmasks = ci.crop_images_parallel(segmasks , push_contact_list)
-            # cropped_masked_depth_images = ci.crop_images_parallel(np.multiply(depth_images, segmasks) , push_contact_list)
 
             for env_idx in range(self.num_envs):
                 cropped_depth_img, cropped_segmask = cropped_depth_images[env_idx], cropped_segmasks[env_idx]
@@ -855,38 +913,61 @@ class PushSim(object):
             depth_noise_images (numpy.ndarray): image of shape (num_envs, H, W, 3)
             segmasks (numpy.ndarray): segmentation mask of shape (num_envs, H, W)
         """
-        depth_images, depth_noise_images, segmasks = [], [], []
+        depth_images, ir_depth_images, segmasks = [], [], []
         
         self.gym.render_all_camera_sensors(self.sim)
+
+        main_image = self.gym.get_camera_image(self.sim, self.envs[0], self.camera_handles[0], gymapi.IMAGE_DEPTH)
+        main_image = np.array(main_image, dtype = np.float32)
+        ir_pattern = IRPattern(main_image.shape, self.camera_intrinsic)
         
         for i in range(self.num_envs):
             
             depth_image = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_DEPTH)
-            segmask = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_SEGMENTATION)
-            # Change data type for lighter storage
+            depth_image_l = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles_l[i], gymapi.IMAGE_DEPTH)
+            color_image = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_COLOR)
+            color_image_l = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles_l[i], gymapi.IMAGE_COLOR)
             depth_image = np.array(depth_image, dtype = np.float32)
-            # segmask = np.array(segmask, dtype = np.bool8)
-            segmask = np.array(segmask, dtype = np.uint8) # for line contoured image
-
-            _noise_img = add_depth_noise('gauss', depth_image)
-            _noise_img = add_depth_noise('gauss_field', _noise_img)
-            
+            depth_image_l = np.array(depth_image, dtype = np.float32)
+            color_image = cv2.cvtColor(color_image.reshape(color_image.shape[0],int(color_image.shape[1]/4),-1), cv2.COLOR_BGRA2GRAY)
+            color_image_l = cv2.cvtColor(color_image_l.reshape(color_image_l.shape[0],int(color_image_l.shape[1]/4),-1), cv2.COLOR_BGRA2GRAY)
             depth_images.append(depth_image)
-            depth_noise_images.append(_noise_img)
+
+            depth_image = ir_pattern.ir_matrix_from_depth(depth_image, 0.055 / 2)
+            depth_image_l = ir_pattern.ir_matrix_from_depth(depth_image_l, -0.055 / 2)
+
+            color_image[np.where(depth_image)] = color_image[np.where(depth_image)] * 1.5
+            color_image_l[np.where(depth_image_l)] = color_image_l[np.where(depth_image_l)] * 1.5
+
+            depth = img_to_depth(color_image, color_image_l, self.camera_intrinsic)
+
+            segmask = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_SEGMENTATION)
+            segmask = np.array(segmask, dtype = np.uint8) # for line contoured image
+            ir_depth_images.append(depth)
             segmasks.append(segmask)
             
         depth_images = np.array(depth_images) * -1
-        depth_noise_images = np.array(depth_noise_images) * -1
+        ir_depth_images = np.array(ir_depth_images)
         segmasks = np.array(segmasks)
+
+        # depth_image1 = self.gym.get_camera_image(self.sim, self.envs[0], self.camera_handles[0], gymapi.IMAGE_DEPTH)
+        # depth_image1 = np.array(depth_image1, dtype = np.float32)
+        # # depth_image1 = cv2.resize(depth_image1, (1280, 720))
+        # with open(os.path.join(save_dir, 'depth_image_0.npy'), 'wb') as f:
+        #     np.save(f, np.array(depth_image1))
+        # # cv2.imwrite(save_dir + '/depth_image_0.png', depth_image1)
+        # cv2.imwrite(save_dir + '/gray_image_0.png', depth_images[0])
+        # with open(os.path.join(save_dir, 'segment_image_0.npy'), 'wb') as f:
+        #     np.save(f, np.array(segmasks[0]))
+        # depth_image1 = self.gym.get_camera_image(self.sim, self.envs[0], self.camera_handles_l[0], gymapi.IMAGE_DEPTH)
+        # depth_image1 = np.array(depth_image1, dtype = np.float32)
+        # # depth_image1 = cv2.resize(depth_image1, (1280, 720))
+        # with open(os.path.join(save_dir, 'depth_image_1.npy'), 'wb') as f:
+        #     np.save(f, np.array(depth_image1))
+        # # cv2.imwrite(save_dir + '/depth_image_1.png', depth_image1)
+        # cv2.imwrite(save_dir + '/gray_image_1.png', depth_images_assiss[0])
         
-        # fig = plt.figure(figsize=(10, 10))
-        # columns = int(np.ceil(np.sqrt(depth_images.shape[0])))
-        # for i in range(self.num_envs):
-        #     ax = fig.add_subplot(columns, columns, i+1)
-        #     ax.imshow(depth_images[i])
-        # plt.show()
-        
-        return depth_images, depth_noise_images, segmasks
+        return depth_images, ir_depth_images, segmasks
 
     def relocate_pusher(self, push_contact_list):
         '''
