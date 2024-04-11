@@ -238,10 +238,6 @@ class PushSim(object):
         # Create ground
         self.gym.add_ground(self.sim, plane_params)
 
-        # heightfield = np.zeros((num_terains*num_rows, num_cols), dtype=np.int16)
-        # vertices, triangles = terrain_utils.convert_heightfield_to_trimesh(heightfield, horizontal_scale=horizontal_scale, vertical_scale=vertical_scale, slope_threshold=1.5)
-        # self.gym.add_triangle_mesh(self.sim, vertices.flatten(), triangles.flatten(), tm_params)
-
         
     def _create_viewer(self):
         ''' Create viewer '''
@@ -268,10 +264,6 @@ class PushSim(object):
     def _create_light(self):
         ''' Create Lights '''
         self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0.0, 0.0, 0.0), gymapi.Vec3(0, 0, 0), gymapi.Vec3(-1, -2, 0.1))
-        # self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0, 0, 0), gymapi.Vec3(1, 1, 1), gymapi.Vec3(0, 0, 10))
-        # self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0.1, 0.1, 0.1), gymapi.Vec3(0, 0, 0), gymapi.Vec3(0, 0, 10))
-        # self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0.1, 0.1, 0), gymapi.Vec3(0, 0, 0), gymapi.Vec3(0, 0, 0))
-        # self.gym.set_light_parameters(self.sim, 0, gymapi.Vec3(0.1, 0.1, 0.1), gymapi.Vec3(0, 0, 0), gymapi.Vec3(1, 2, 0.1))
 
     
     def _create_environments(self):
@@ -319,9 +311,10 @@ class PushSim(object):
             slider_actor_handle = self.gym.create_actor(env, slider_asset, default_slider_pose, slider_name, env_idx, segmentationId=0)
             pusher_actor_handle = self.gym.create_actor(env, pusher_asset, pusher_pose, pusher_name, env_idx, segmentationId=0)
             
+            color = np.random.rand(1)*0.9 + 0.1
+
             # set visual property
-            self.gym.set_rigid_body_color(env, slider_actor_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(0.1, 0.1, 0.1))
-            # self.gym.set_rigid_body_color(env, slider_actor_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(1, 1, 1))
+            self.gym.set_rigid_body_color(env, slider_actor_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(color, color, color))
             # Color left finger
             self.gym.set_rigid_body_color(env, pusher_actor_handle, 5, gymapi.MESH_VISUAL, gymapi.Vec3(1., 0., 1.))
             # Color right finger
@@ -371,7 +364,7 @@ class PushSim(object):
         else:
             self.contact_angles = np.repeat(self.gripper_angle, self.num_envs)
         if self.rand_height:
-            self.contact_heights = self.gripper_height + (0.07 - self.gripper_height) * np.random.rand(self.num_envs)
+            self.contact_heights = self.gripper_height + (0.05 - self.gripper_height) * np.random.rand(self.num_envs)
         else:
             self.contact_heights = np.repeat(self.gripper_height, self.num_envs)
 
