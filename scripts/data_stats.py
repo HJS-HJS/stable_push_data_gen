@@ -62,15 +62,14 @@ if var == "image":
     print('load')
     images = np.array(image_list)
     print('np')
+    del image_list
+    gc.collect()
+    print('delete')
     mu_img = np.mean(images)
     print('mean')
         
-    # try:
-        # print('try')
-        # std_img = np.std(images)
-        # print('success')
-    # except:
     print('retry')
+    # std_img = np.std(images)
     # std_img = cal_std(mu_img, images, 2)
     std_img = np.sum(np.power(images-mu_img, 2))/images.size
     print('success')
