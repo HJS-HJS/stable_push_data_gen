@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-def add_depth_noise(depth_image: np.array, noise_type: str="gauss_field", scale: float=0.1, var: float=0.000001) -> np.array:
+def add_depth_noise(depth_image: np.array, noise_type: str="gauss_field", scale: float=0.0012, var: float=0.000001) -> np.array:
     """add noise in depth image
 
     Args:

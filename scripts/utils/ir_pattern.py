@@ -26,18 +26,18 @@ class IRPattern(object):
         self.cx = camera_intrinsic[0][2]
         self.cy = camera_intrinsic[1][2]
 
-    def gen_simple_ir_pattern(self, transpose: float=0, dot_length: float=10.5, dot_diameter: float=2, rotation: List[float]=[50, 60])-> np.array:        
+    def gen_simple_ir_pattern(self, transpose: float=0, dot_length: float=12.6, dot_diameter: float=3, rotation: List[float]=[50, 60])-> np.array:        
         # Generate IR pattern matrix from example depth image with a depth of 1.
         return self.ir_matrix_from_depth(np.ones(self.image_shape), transpose, dot_length, dot_diameter, rotation)
 
-    def ir_matrix_from_depth(self, depth_image: np.array, transpose: float, dot_length: float=10.5, dot_diameter: float=2, rotation: List[float]=[50, 60])-> np.array:
+    def ir_matrix_from_depth(self, depth_image: np.array, transpose: float, dot_length: float=12.6, dot_diameter: float=3, rotation: List[float]=[50, 60])-> np.array:
         """A function that creates an IR pattern matrix using the values ​​of the depth image. A matrix of the same size as the Input Depth image is created, recording whether an IR pattern exists at the corresponding pixel location.
 
         Args:
             depth_image (np.array): (H, W) depth image to check IR pattern.
             transpose (float): A value for how far the camera is from the IR pattern projector in hardware. The IR projector and camera are always spaced apart in the width direction.
-            dot_length (float, optional): Dot spacing in IR pattern. Defaults to 10.5.
-            dot_size (float, optional): Dot size in IR pattern. Defaults to 2.
+            dot_length (float, optional): Dot spacing in IR pattern. Defaults to 12.6.
+            dot_size (float, optional): Dot size in IR pattern. Defaults to 3.
             rotation (List[float], optional): List of tilt angles for IR patterns. Defaults to [50, 60].
 
         Returns:
@@ -91,15 +91,15 @@ class IRPattern(object):
 
         # Output is a matrix in which pixels with IR patterns are True.
         return _matrix
-    def ir_matrix_from_depth_plane(self, depth_image: np.array, transpose: float, dot_length: float=10.5, dot_diameter: float=2, rotation: List[float]=[50, 60])-> np.array:
+    def ir_matrix_from_depth_plane(self, depth_image: np.array, transpose: float, dot_length: float=12.6, dot_diameter: float=3, rotation: List[float]=[50, 60])-> np.array:
         """A function that creates an IR pattern matrix using the values ​​of the depth image. A matrix of the same size as the Input Depth image is created, recording whether an IR pattern exists at the corresponding pixel location.
         Unlike function ir_matrix_from_depth, an IR pattern without distortion is generated. 
 
         Args:
             depth_image (np.array): (H, W) depth image to check IR pattern.
             transpose (float): A value for how far the camera is from the IR pattern projector in hardware. The IR projector and camera are always spaced apart in the width direction.
-            dot_length (float, optional): Dot spacing in IR pattern. Defaults to 10.5.
-            dot_size (float, optional): Dot size in IR pattern. Defaults to 2.
+            dot_length (float, optional): Dot spacing in IR pattern. Defaults to 12.6.
+            dot_size (float, optional): Dot size in IR pattern. Defaults to 3.
             rotation (List[float], optional): List of tilt angles for IR patterns. Defaults to [50, 60].
 
         Returns:
@@ -150,7 +150,7 @@ class IRPattern(object):
         # Output is a matrix in which pixels with IR patterns are True.
         return _matrix
 
-    def segmask_transpose(self, depth_image: np.array, segmask: np.array, seg_intrinsic: np.array, transpose: float, scale: float):
+    def segmask_transpose(self, depth_image: np.array, segmask: np.array, seg_intrinsic: np.array, transpose: float=0, scale: float=1.05):
         """TODO: complete this function
 
         Args:
@@ -185,11 +185,11 @@ class IRPattern(object):
         _img[:,:,1] = (_img[:,:,1] - self.cx) * np.abs(depth_image) / self.fx
         
 
-        _img[:,:,1] += transpose
+        _img[:,:,0] += transpose
 
         _ir_img = np.zeros(_img.shape)
-        _ir_img[:,:,0] = ((_img[:,:,0] * seg_intrinsic[0][0]) / np.abs(depth_image) + seg_intrinsic[0][2]).astype(int)
-        _ir_img[:,:,1] = ((_img[:,:,1] * seg_intrinsic[1][1]) / np.abs(depth_image) + seg_intrinsic[1][2]).astype(int)
+        _ir_img[:,:,0] = ((_img[:,:,0] * seg_intrinsic[1][1]) / np.abs(depth_image) + seg_intrinsic[1][2]).astype(int)
+        _ir_img[:,:,1] = ((_img[:,:,1] * seg_intrinsic[0][0]) / np.abs(depth_image) + seg_intrinsic[0][2]).astype(int)
 
         true_list = np.where((_ir_img[:,:,0]<y_max) & (_ir_img[:,:,0]>y_min) & (_ir_img[:,:,1]<x_max) & (_ir_img[:,:,1]>x_min))
 

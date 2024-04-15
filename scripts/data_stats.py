@@ -1,9 +1,8 @@
 import os
-import numpy as np
-from utils.dataloader_parallel import DataLoaderParallel
-from tqdm import tqdm
 import re
 import argparse
+import numpy as np
+from utils.dataloader_parallel import DataLoaderParallel
 
 '''
 Derives mean and standard deviation values from train data.
@@ -41,26 +40,26 @@ max_index = indices[-1]
 dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 
 if var == "image":
-    
     # Analyze image data
     image_list = dataloader.load_image_tensor_parallel()
+    print('get')
     data       = np.array(image_list)
+    print('np')
     data       = np.mean(np.squeeze(data), axis=(1,2))
     
 elif var == "masked_image":
-    
     # Analyze masked_image data
     masked_image_list = dataloader.load_masked_image_tensor_parallel()
     data              = np.array(masked_image_list)
     data              = np.mean(np.squeeze(data), axis=(1,2))
     
 elif var == "velocity":
-    
     # Analyze velocity data
     velocity_list = dataloader.load_velocity_tensor_parallel()
     data          = np.array(velocity_list)
-
+print('calculate')
 mu_img, std_img = np.mean(data), np.std(data)
+print('save')
     
 # Store files
 np.save(os.path.join(save_dir, var + '_mean.npy'), mu_img)
