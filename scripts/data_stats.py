@@ -56,13 +56,14 @@ if var == "image":
     mu_img = np.mean(images)
     print('mean')
         
-    try:
-        std_img = np.std(images)
-        print('success')
-    except:
-        print('retry')
-        std_img = cal_std(mu_img, images, 2)
-        print('success')
+    # try:
+        # print('try')
+        # std_img = np.std(images)
+        # print('success')
+    # except:
+    print('retry')
+    std_img = cal_std(mu_img, images, 2)
+    print('success')
 
     # Store files
     np.save(os.path.join(save_dir,'image_mean.npy'), mu_img)
