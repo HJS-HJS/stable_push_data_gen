@@ -1,5 +1,4 @@
 import os
-import gc
 import numpy as np
 from utils.dataloader_parallel import DataLoaderParallel
 from tqdm import tqdm
@@ -41,34 +40,22 @@ max_index = indices[-1]
 # Load each type of train data
 dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 
-def cal_std(mean, array, split):
-    std = 0
-    size = array.size
-    split_array = np.array(np.split(array, split))
-    del array
-    gc.collect()
-    for split in split_array:
-        print('seq')
-        std += np.sum(np.power(split-mean, 2))
-        del split
-        gc.collect()
-        print(split_array.shape)
-    return np.sqrt(std/size)
-
 if var == "image":
     
     # Analyze image data
     # image_list = dataloader.load_image_tensor_parallel()
     print('load')
     images = np.array(dataloader.load_image_tensor_parallel())
-    print('delete')
+    print('np')
     mu_img = np.mean(images)
-    print('mean')
+    print('mean: ', mu_img)
         
-    print('retry')
-    # std_img = np.std(images)
+    print(images.shape)
+    print(np.squeeze(images).shape)
+    print(images.reshape(-1).shape)
+    std_img = np.std(np.squeeze(images))
+    std_img = np.std(np.squeeze(images.reshape(-1)))
     # std_img = cal_std(mu_img, images, 2)
-    std_img = np.sum(np.power(images-mu_img, 2))/images.size
     print('success')
 
     # Store files
