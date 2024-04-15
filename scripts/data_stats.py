@@ -58,9 +58,9 @@ def cal_std(mean, array, split):
 if var == "image":
     
     # Analyze image data
-    image = dataloader.load_image_tensor_parallel()
+    images = dataloader.load_image_tensor_parallel()
     print('load')
-    images = np.array(image)
+    images = np.array(images)
     print('np')
     mu_img = np.mean(images)
     print('mean')
