@@ -43,24 +43,11 @@ dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 if var == "image":
     
     # Analyze image data
-    # image_list = dataloader.load_image_tensor_parallel()
-    print('load')
-    images = np.array(dataloader.load_image_tensor_parallel())
-    print('np: ', images.shape)
-    mu_img = np.mean(images)
-    print('mean: ', mu_img)
+    image_list = dataloader.load_image_tensor_parallel()
+    images = np.array(image_list)
     images = np.mean(np.squeeze(images), axis=(1,2))
-    print('shorten: ', images.shape)
     mu_img = np.mean(images)
-    print('mean: ', mu_img)
-        
-    # print(images.shape)
-    # print(np.squeeze(images).shape)
-    # print(images.reshape(-1).shape)
-    # std_img = np.std(images.reshape(-1))
     std_img = np.std(images)
-    # std_img = cal_std(mu_img, images, 2)
-    print('success')
 
     # Store files
     np.save(os.path.join(save_dir,'image_mean.npy'), mu_img)
