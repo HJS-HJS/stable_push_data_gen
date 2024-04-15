@@ -42,7 +42,8 @@ dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 
 def cal_std(mean, array, split):
     std = 0
-    for split_array in np.split(array,split):
+    for split_array in np.split(array, split):
+        print('seq')
         std += np.sum(np.power(split_array-mean, 2))
     return np.sqrt(std/array.size)
 
