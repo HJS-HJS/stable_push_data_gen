@@ -45,6 +45,7 @@ def cal_std(mean, array, split):
     for split_array in np.split(array, split):
         print('seq')
         std += np.sum(np.power(split_array-mean, 2))
+        split_array = None
     return np.sqrt(std/array.size)
 
 if var == "image":
