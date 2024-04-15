@@ -1,5 +1,6 @@
-import numpy as np
 import os
+import gc
+import numpy as np
 from utils.dataloader_parallel import DataLoaderParallel
 from tqdm import tqdm
 import re
@@ -42,11 +43,13 @@ dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 
 def cal_std(mean, array, split):
     std = 0
+    size = array.size
     for split_array in np.split(array, split):
         print('seq')
         std += np.sum(np.power(split_array-mean, 2))
-        split_array = None
-    return np.sqrt(std/array.size)
+        del split_array
+        gc.collect()
+    return np.sqrt(std/size)
 
 if var == "image":
     
