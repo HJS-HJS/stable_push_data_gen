@@ -44,11 +44,15 @@ dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 def cal_std(mean, array, split):
     std = 0
     size = array.size
-    for split_array in np.split(array, split):
+    split_array = np.array(np.split(array, split))
+    del array
+    gc.collect()
+    for split in split_array:
         print('seq')
-        std += np.sum(np.power(split_array-mean, 2))
-        del split_array
+        std += np.sum(np.power(split-mean, 2))
+        del split
         gc.collect()
+        print(split_array.shape)
     return np.sqrt(std/size)
 
 if var == "image":
@@ -67,7 +71,8 @@ if var == "image":
         # print('success')
     # except:
     print('retry')
-    std_img = cal_std(mu_img, images, 2)
+    # std_img = cal_std(mu_img, images, 2)
+    std_img = np.sum(np.power(images-mu_img, 2))/images.size
     print('success')
 
     # Store files
