@@ -50,11 +50,10 @@ if var == "image":
     mu_img = np.mean(images)
     print('mean: ', mu_img)
         
-    print(images.shape)
-    print(np.squeeze(images).shape)
-    print(images.reshape(-1).shape)
-    std_img = np.std(np.squeeze(images))
-    std_img = np.std(np.squeeze(images.reshape(-1)))
+    # print(images.shape)
+    # print(np.squeeze(images).shape)
+    # print(images.reshape(-1).shape)
+    std_img = np.std(images.reshape(-1))
     # std_img = cal_std(mu_img, images, 2)
     print('success')
 
