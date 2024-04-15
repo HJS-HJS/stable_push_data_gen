@@ -44,33 +44,24 @@ if var == "image":
     
     # Analyze image data
     image_list = dataloader.load_image_tensor_parallel()
-    images = np.array(image_list)
-    images = np.mean(np.squeeze(images), axis=(1,2))
-    mu_img = np.mean(images)
-    std_img = np.std(images)
-
-    # Store files
-    np.save(os.path.join(save_dir,'image_mean.npy'), mu_img)
-    np.save(os.path.join(save_dir,'image_std.npy'), std_img)
+    data       = np.array(image_list)
+    data       = np.mean(np.squeeze(data), axis=(1,2))
     
 elif var == "masked_image":
     
     # Analyze masked_image data
     masked_image_list = dataloader.load_masked_image_tensor_parallel()
-    masked_images        = np.array(masked_image_list)
-    mu_img, std_img = np.mean(masked_images), np.std(masked_images)
-    
-    # Store files
-    np.save(os.path.join(save_dir,'masked_image_mean.npy'), mu_img)
-    np.save(os.path.join(save_dir,'masked_image_std.npy'), std_img)
+    data              = np.array(masked_image_list)
+    data              = np.mean(np.squeeze(data), axis=(1,2))
     
 elif var == "velocity":
     
     # Analyze velocity data
     velocity_list = dataloader.load_velocity_tensor_parallel()
-    velocities        = np.array(velocity_list)
-    mu_img, std_img = np.mean(velocities), np.std(velocities)
+    data          = np.array(velocity_list)
+
+mu_img, std_img = np.mean(data), np.std(data)
     
-    # Store files
-    np.save(os.path.join(save_dir,'velocity_mean.npy'), mu_img)
-    np.save(os.path.join(save_dir,'velocity_std.npy'), std_img)
+# Store files
+np.save(os.path.join(save_dir, var + '_mean.npy'), mu_img)
+np.save(os.path.join(save_dir, var + '_std.npy'), std_img)
