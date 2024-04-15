@@ -61,7 +61,7 @@ if var == "image":
         print('success')
     except:
         print('retry')
-        std_img = cal_std(mu_img, images)
+        std_img = cal_std(mu_img, images, 2)
         print('success')
 
     # Store files
