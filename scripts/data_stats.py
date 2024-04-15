@@ -44,8 +44,13 @@ if var == "image":
     
     # Analyze image data
     image_list = dataloader.load_image_tensor_parallel()
+    print('load')
     images        = np.array(image_list)
-    mu_img, std_img = np.mean(images), np.std(images)
+    print('np')
+    mu_img = np.mean(images)
+    print('mean')
+    std_img = np.std(images)
+    print('std')
     
     # Store files
     np.save(os.path.join(save_dir,'image_mean.npy'), mu_img)
