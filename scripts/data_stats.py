@@ -50,13 +50,19 @@ if var == "image":
     
     # Analyze image data
     image = dataloader.load_image_tensor_parallel()
-    images        = np.array(image)
+    print('load')
+    images = np.array(image)
+    print('np')
     mu_img = np.mean(images)
+    print('mean')
         
     try:
         std_img = np.std(images)
+        print('success')
     except:
+        print('retry')
         std_img = cal_std(mu_img, images)
+        print('success')
 
     # Store files
     np.save(os.path.join(save_dir,'image_mean.npy'), mu_img)
