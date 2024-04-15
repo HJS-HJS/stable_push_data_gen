@@ -40,18 +40,24 @@ max_index = indices[-1]
 # Load each type of train data
 dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 
+def cal_std(mean, array, split):
+    std = 0
+    for split_array in np.split(array,split):
+        std += np.sum(np.power(split_array-mean, 2))
+    return np.sqrt(std/array.size)
+
 if var == "image":
     
     # Analyze image data
-    image_list = dataloader.load_image_tensor_parallel()
-    print('load')
-    images        = np.array(image_list)
-    print('np')
+    image = dataloader.load_image_tensor_parallel()
+    images        = np.array(image)
     mu_img = np.mean(images)
-    print('mean')
-    std_img = np.std(images)
-    print('std')
-    
+        
+    try:
+        std_img = np.std(images)
+    except:
+        std_img = cal_std(mu_img, images)
+
     # Store files
     np.save(os.path.join(save_dir,'image_mean.npy'), mu_img)
     np.save(os.path.join(save_dir,'image_std.npy'), std_img)
