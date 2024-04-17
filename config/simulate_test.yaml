@@ -40,8 +40,9 @@ simulation:
 
   # Slider setup
   slider_rand_position_offset: [0.15, 0.05] # [m, m] checked
-  # slider_rand_position_range: [0, 0] # [%, %]
+  # slider_rand_position_offset: [-0.45, 0.3] # [m, m] checked
   slider_rand_position_range: [0.4, 0.7] # [%, %]
+  # slider_rand_position_range: [0, 0] # [%, %]
   slider_rand_rotation_range: 180 # degrees 180
   camera_rand_position_range: 0 # meters 0.05
   camera_rand_rotation_range: 0 #degrees 10

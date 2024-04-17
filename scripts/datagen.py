@@ -132,14 +132,14 @@ class PushSim(object):
         self.cam_pose = gymapi.Transform()
         # self.cam_pose.p = gymapi.Vec3(cam_cfg['camera_pose']['tran'][0], cam_cfg['camera_pose']['tran'][1], cam_cfg['camera_pose']['tran'][2])
             
-        if len(cam_cfg['camera_pose']['rot']) == 3:
-            pass
-            self.cam_pose.r = gymapi.Quat.from_euler_zyx(np.pi / 2 - cam_cfg['camera_pose']['rot'][2], -np.pi / 2 - cam_cfg['camera_pose']['rot'][1], cam_cfg['camera_pose']['rot'][0])
-        elif len(cam_cfg['camera_pose']['rot']) == 4:
-            _rot = gymapi.Quat(cam_cfg['camera_pose']['rot'][0], cam_cfg['camera_pose']['rot'][1], cam_cfg['camera_pose']['rot'][2], cam_cfg['camera_pose']['rot'][3]).to_euler_zyx()
-            self.cam_pose.r = gymapi.Quat.from_euler_zyx(-np.pi / 2 + _rot[2], np.pi / 2 - _rot[1], np.pi - _rot[0])
-        else:
-            raise
+        # if len(cam_cfg['camera_pose']['rot']) == 3:
+        #     pass
+        #     self.cam_pose.r = gymapi.Quat.from_euler_zyx(np.pi / 2 - cam_cfg['camera_pose']['rot'][2], -np.pi / 2 - cam_cfg['camera_pose']['rot'][1], cam_cfg['camera_pose']['rot'][0])
+        # elif len(cam_cfg['camera_pose']['rot']) == 4:
+        #     _rot = gymapi.Quat(cam_cfg['camera_pose']['rot'][0], cam_cfg['camera_pose']['rot'][1], cam_cfg['camera_pose']['rot'][2], cam_cfg['camera_pose']['rot'][3]).to_euler_zyx()
+        #     self.cam_pose.r = gymapi.Quat.from_euler_zyx(-np.pi / 2 + _rot[2], np.pi / 2 - _rot[1], np.pi - _rot[0])
+        # else:
+        #     raise
 
         self.cam_matrix = np.array(cam_cfg['camera_pose']['matrix']).reshape(4,4)
 
@@ -659,7 +659,6 @@ class PushSim(object):
         # plt.show()
 
         # fig = plt.figure(figsize=(10,10))
-        # fig = plt.figure()
         # col = int(np.ceil(np.sqrt(self.num_envs)))
         # for i in range(self.num_envs):
         #     pcd = depth_to_pcd(depth_images[i] * segmasks[i], self.camera_intrinsic)
@@ -954,8 +953,8 @@ class PushSim(object):
             depth_image = ir_pattern.ir_matrix_from_depth(depth_image, 0.055 / 2)
             depth_image_l = ir_pattern.ir_matrix_from_depth(depth_image_l, -0.055 / 2)
 
-            color_image[np.where(depth_image)] = color_image[np.where(depth_image)] * 1.5
-            color_image_l[np.where(depth_image_l)] = color_image_l[np.where(depth_image_l)] * 1.5
+            color_image[np.where(depth_image)] = (color_image[np.where(depth_image)] + 1) * 1.5
+            color_image_l[np.where(depth_image_l)] = (color_image_l[np.where(depth_image_l)] + 1) * 1.5
 
             depth = img_to_depth(color_image, color_image_l, self.camera_intrinsic)
 
@@ -971,24 +970,37 @@ class PushSim(object):
         ir_depth_images = np.array(ir_depth_images)
         segmasks = np.array(segmasks)
 
-        # save_dir = "~/catkin_ws/src"
+
+        save_dir = "/home/rise/catkin_ws/src"
+
         # depth_image1 = self.gym.get_camera_image(self.sim, self.envs[0], self.camera_handles[0], gymapi.IMAGE_DEPTH)
         # depth_image1 = np.array(depth_image1, dtype = np.float32)
-        # # depth_image1 = cv2.resize(depth_image1, (1280, 720))
-        # with open(os.path.join(save_dir, 'depth_image_0.npy'), 'wb') as f:
+        # with open(os.path.join(save_dir, 'depth_image_2.npy'), 'wb') as f:
         #     np.save(f, np.array(depth_image1))
-        # # cv2.imwrite(save_dir + '/depth_image_0.png', depth_image1)
-        # cv2.imwrite(save_dir + '/gray_image_0.png', depth_images[0])
-        # with open(os.path.join(save_dir, 'segment_image_0.npy'), 'wb') as f:
-        #     np.save(f, np.array(segmasks[0]))
-        # depth_image1 = self.gym.get_camera_image(self.sim, self.envs[0], self.camera_handles_l[0], gymapi.IMAGE_DEPTH)
-        # depth_image1 = np.array(depth_image1, dtype = np.float32)
-        # # depth_image1 = cv2.resize(depth_image1, (1280, 720))
-        # with open(os.path.join(save_dir, 'depth_image_1.npy'), 'wb') as f:
-        #     np.save(f, np.array(depth_image1))
-        # # cv2.imwrite(save_dir + '/depth_image_1.png', depth_image1)
-        # cv2.imwrite(save_dir + '/gray_image_1.png', depth_images_assiss[0])
-        
+        # color_image = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_COLOR)
+        # color_image = cv2.cvtColor(color_image.reshape(color_image.shape[0],int(color_image.shape[1]/4),-1), cv2.COLOR_BGRA2GRAY)
+        # cv2.imwrite(save_dir + '/gray_image_2.png', color_image)
+
+        # depth_image2 = self.gym.get_camera_image(self.sim, self.envs[0], self.camera_handles_l[0], gymapi.IMAGE_DEPTH)
+        # depth_image2 = np.array(depth_image2, dtype = np.float32)
+        # with open(os.path.join(save_dir, 'depth_image_3.npy'), 'wb') as f:
+        #     np.save(f, np.array(depth_image2))
+        # color_image_l = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles_l[i], gymapi.IMAGE_COLOR)
+        # color_image_l = cv2.cvtColor(color_image_l.reshape(color_image_l.shape[0],int(color_image_l.shape[1]/4),-1), cv2.COLOR_BGRA2GRAY)
+        # cv2.imwrite(save_dir + '/gray_image_3.png', color_image_l)
+
+
+        # segmask = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_SEGMENTATION)
+        # segmask = np.array(segmask, dtype = np.uint8) # for line contoured image
+        # with open(os.path.join(save_dir, 'segment_image_1.npy'), 'wb') as f:
+        #     np.save(f, np.array(segmask))
+        # fig = plt.figure(figsize=(10,10))
+        # ax = fig.add_subplot(1,2,1)
+        # ax.imshow(color_image)
+        # ax = fig.add_subplot(1,2,2)
+        # ax.imshow(segmask)
+        # plt.show()
+
         return depth_images, ir_depth_images, segmasks
 
     def relocate_pusher(self, push_contact_list):
