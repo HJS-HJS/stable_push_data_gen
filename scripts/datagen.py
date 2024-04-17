@@ -913,7 +913,7 @@ class PushSim(object):
                 # Save each pushing direction (network input)
                 with open(os.path.join(self.save_dir, 'velocity' + name), 'wb') as f:
                     np.save(f, np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
-                    print(np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
+                    # print(np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
 
                 # Save each label (network output)
                 with open(os.path.join(self.save_dir, 'label' + name), 'wb') as f:
