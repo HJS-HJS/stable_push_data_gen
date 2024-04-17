@@ -7,8 +7,8 @@ simulation:
   compute_device_id: 0
   graphics_device_id: 0
   physics_engine: PHYSX
-  num_iters: 3
-  num_envs: 120
+  num_iters: 1
+  num_envs: 15
   dt: 0.016667
   # camera: IntelRealSenseD415
   camera: IntelRealSenseD415IR
@@ -39,11 +39,8 @@ simulation:
   env_space: [1.6, 0.8]
 
   # Slider setup
-  slider_rand_position_offset: [-0.05, 0.05] # [m, m]
-  # slider_rand_position_offset: [-0.2, 0] # [m, m]
-  # slider_rand_position_offset: [-0.45, 0] # [m, m]
+  slider_rand_position_offset: [0.15, 0.05] # [m, m] checked
   # slider_rand_position_range: [0, 0] # [%, %]
-  # slider_rand_position_range: [0.05, 0.4] # [%, %]
   slider_rand_position_range: [0.4, 0.7] # [%, %]
   slider_rand_rotation_range: 180 # degrees 180
   camera_rand_position_range: 0 # meters 0.05
@@ -162,16 +159,8 @@ camera:
     camera_pose:
       tran: [-1.0649844006838340, 0.095766369044197786, 0.95766369044197786]
       rot: [0.0032768099437612097, 0.9842047843130775, -0.015359940559485506, 0.17633569484891592]
-      # rot: [-0.02431194, -2.83329651, 0.04357204]
 
       matrix: [ -9.5284142039327635e-01, 2.1412216810855048e-02, 3.0271231318558661e-01, -1.0649844006838340e+00,
         1.2093728749856781e-02, 9.9939450765343596e-01, -3.2624527537913145e-02, 9.5766369044197786e-02,
         -3.0322758665373545e-01, -2.7425080553976539e-02, -9.5252343574778220e-01, 9.5766369044197786e-01,
         0., 0., 0., 1. ]
-
-      
-
-      # [ -9.5284142039327635e-01, 2.1412216810855048e-02, 3.0271231318558661e-01, -1.0649844006838340e+00,
-      #  1.2093728749856781e-02, 9.9939450765343596e-01, -3.2624527537913145e-02, 9.5766369044197786e-01,
-      #  -3.0322758665373545e-01, -2.7425080553976539e-02, -9.5252343574778220e-01, 9.5766369044197786e-01,
-      #   0., 0., 0., 1. ]

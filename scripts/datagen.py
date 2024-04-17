@@ -314,7 +314,8 @@ class PushSim(object):
             color = np.random.rand(1)*0.9 + 0.1
 
             # set visual property
-            self.gym.set_rigid_body_color(env, slider_actor_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(color, color, color))
+            # self.gym.set_rigid_body_color(env, slider_actor_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(color, color, color))
+            self.gym.set_rigid_body_color(env, slider_actor_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(0, 0, 0))
             # Color left finger
             self.gym.set_rigid_body_color(env, pusher_actor_handle, 5, gymapi.MESH_VISUAL, gymapi.Vec3(1., 0., 1.))
             # Color right finger
@@ -363,10 +364,6 @@ class PushSim(object):
             self.contact_angles = -np.pi/2 * np.random.rand(self.num_envs)
         else:
             self.contact_angles = np.repeat(self.gripper_angle, self.num_envs)
-        if self.rand_height:
-            self.contact_heights = self.gripper_height + (0.05 - self.gripper_height) * np.random.rand(self.num_envs)
-        else:
-            self.contact_heights = np.repeat(self.gripper_height, self.num_envs)
 
     # def __del__(self):
     #     if not self.headless:
@@ -645,18 +642,24 @@ class PushSim(object):
 #############################################################################################
 
 
-        # fig = plt.figure(figsize=(10,10))
+        # fig = plt.figure()
         # col = int(np.ceil(np.sqrt(self.num_envs)))
         # for i in range(self.num_envs):
-        #     ax = fig.add_subplot(col * 2,col,3 * i + 1)
+        #     ax = fig.add_subplot(col * 3,col,3 * i + 1)
         #     ax.imshow(depth_images[i])
-        #     ax = fig.add_subplot(col * 2,col,3 * i + 2)
+        #     ax = fig.add_subplot(col * 3,col,3 * i + 2)
         #     ax.imshow(ir_depth_images[i])
-        #     ax2 = fig.add_subplot(col * 2,col,3 * i + 3)
+        #     ax2 = fig.add_subplot(col * 3,col,3 * i + 3)
         #     ax2.imshow(segmasks[i])
         # plt.show()
 
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111)
+        # ax.imshow(ir_depth_images[0])
+        # plt.show()
+
         # fig = plt.figure(figsize=(10,10))
+        # fig = plt.figure()
         # col = int(np.ceil(np.sqrt(self.num_envs)))
         # for i in range(self.num_envs):
         #     pcd = depth_to_pcd(depth_images[i] * segmasks[i], self.camera_intrinsic)
@@ -671,6 +674,46 @@ class PushSim(object):
         #     ax = fig.add_subplot(col,col,i + 1, projection='3d')
         #     ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
         # plt.show()
+        # fig = plt.figure()
+        # # pcd = depth_to_pcd(ir_depth_images[i] * segmasks[i], self.camera_intrinsic)
+        # # pcd = add_depth_noise(depth_to_pcd(ir_depth_images[i], self.camera_intrinsic))
+        # pcd = depth_to_pcd(ir_depth_images[i], self.camera_intrinsic)
+        # pcd_object = pcd[np.arange(1,pcd.shape[0],2)]
+        # rot = self.camera_poses[0][:3,:3]
+        # r = R.from_matrix(rot).as_euler('zyx', degrees=True)
+        # r[1] -= 0.4
+        # rot = R.from_euler('zyx',r, degrees=True).as_matrix()
+        # pcd_w = (np.matmul(rot, pcd_object[:,:3].T) + self.camera_poses[0][:3,3].reshape(3,1)).T
+        # max_height = np.max(pcd_w[:,2]) - (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.3
+        # # pcd_w = pcd_w[np.where(pcd_w[:,2] < max_height)[0]]
+        # pcd_w = pcd_w[np.where(pcd_w[:,2] > -0.2)[0]]
+        # pcd_w = pcd_w[np.where(pcd_w[:,0] > -0.87)[0]]
+        # pcd_w = pcd_w[np.where(pcd_w[:,0] < -0.725)[0]]
+        # pcd_w = pcd_w[np.where(pcd_w[:,1] > -0.03)[0]]
+        # pcd_w = pcd_w[np.where(pcd_w[:,1] < 0.12)[0]]
+        # ax = fig.add_subplot(2, 2, 1, projection='3d')
+        # ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
+        # ax.elev = 90
+        # ax.azim = 0
+        # ax.set_xticks(np.arange(-0.92, -0.675, 0.1))
+        # ax.set_yticks(np.arange(-0.07, 0.17, 0.1))
+        # ax.set_zticks(np.arange(-0.22, -0.1, 0.1))
+        # ax = fig.add_subplot(2, 2, 2, projection='3d')
+        # ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
+        # ax.elev = 0
+        # ax.azim = 270
+        # ax.set_xticks(np.arange(-0.92, -0.675, 0.1))
+        # ax.set_yticks(np.arange(-0.07, 0.17, 0.1))
+        # ax.set_zticks(np.arange(-0.22, -0.1, 0.1))
+        # ax = fig.add_subplot(2, 2, 3, projection='3d')
+        # ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
+        # ax.elev = 0
+        # ax.azim = 0
+        # ax.set_xticks(np.arange(-0.92, -0.675, 0.1))
+        # ax.set_yticks(np.arange(-0.07, 0.17, 0.1))
+        # ax.set_zticks(np.arange(-0.22, -0.1, 0.1))
+        # plt.show()
+
 
 #############################################################################################
                     # temp
@@ -689,48 +732,29 @@ class PushSim(object):
                 self._gripper_width_change += 0.02
                 print('Retring contact point sampling with gripper width', self.gripper_width - self._gripper_width_change, '[m]')
         
-        # push_contact = push_contact_list[0]
-        # edge_list_uv = push_contact.edge_uv
-        # contact_point = push_contact.contact_points_uv[0]
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111)
-        # ax.imshow(depth_images[0])
-        # ax.scatter(contact_point[0], contact_point[1], color='r')
-        # ax.scatter(edge_list_uv[:,0], edge_list_uv[:,1], color='b')
-        # plt.show()
+
+        if self.rand_height:
+            for i in range(self.num_envs):
+                pcd = depth_to_pcd(depth_images[i] * segmasks[i], self.camera_intrinsic)
+                pcd_object = pcd[np.arange(1,pcd.shape[0],40)]
+                pcd_w = (np.matmul(self.camera_poses[0][:3,:3], pcd_object[:,:3].T) + self.camera_poses[0][:3,3].reshape(3,1)).T
+                max_height = np.max(pcd_w[:,2]) - (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.1
+                pcd_w = pcd_w[np.where(pcd_w[:,2] < max_height)[0]]
+                self.contact_heights.append(self.gripper_height + (np.max(pcd_w[:,2]) - self.gripper_height) * np.random.rand())
+        else:
+            self.contact_heights = np.repeat(self.gripper_height, self.num_envs)
+
         
         # fig = plt.figure(figsize=(10,10))
         # col = int(np.ceil(np.sqrt(self.num_envs)))
         # for i in range(self.num_envs):
-        #     pcd = depth_to_pcd(depth_images[i] * segmasks[i], self.camera_intrinsic)
-        #     pcd_object = pcd[np.arange(1,pcd.shape[0],2)]
-        #     rot = self.camera_poses[0][:3,:3]
-        #     # r = R.from_matrix(rot).as_euler('zyx', degrees=True)
-        #     # r[1] -= 0.4
-        #     # rot = R.from_euler('zyx',r, degrees=True).as_matrix()
-        #     pcd_w = (np.matmul(rot, pcd_object[:,:3].T) + self.camera_poses[0][:3,3].reshape(3,1)).T
-        #     max_height = np.max(pcd_w[:,2]) - (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.1
-        #     pcd_w = pcd_w[np.where(pcd_w[:,2] < max_height)[0]]
-        #     min_height = np.min(pcd_w[:,2]) + (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.2
-        #     pcd_w = pcd_w[np.where(pcd_w[:,2] > min_height)[0]]
-        #     ax = fig.add_subplot(col * 4,col,4 * i + 1, projection='3d')
-        #     ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
-
-        #     ax = fig.add_subplot(col * 4,col,4 * i + 2)
-        #     pcd_w_2d = pcd_w[:,:2]
-        #     ax.scatter(pcd_w_2d[:, 0], pcd_w_2d[:, 1], color='b')
-        
         #     push_contact = push_contact_list[i]
-        #     if push_contact is not None:
-        #         edge_list_uv = push_contact.edge_uv
-        #         contact_point = push_contact.contact_points_uv[0]
-        #         ax = fig.add_subplot(col * 4,col,4 * i + 3)
-        #         ax.imshow(depth_images[i])
-        #         ax.scatter(contact_point[0], contact_point[1], color='r')
-        #         ax.scatter(edge_list_uv[:,0], edge_list_uv[:,1], color='b')
-
-        #     ax = fig.add_subplot(col * 4,col,4 * i + 4)
-        #     ax.imshow(segmasks[i])
+        #     edge_list_uv = push_contact.edge_uv
+        #     contact_point = push_contact.contact_points_uv[0]
+        #     ax = fig.add_subplot(col,col,i+1)
+        #     ax.imshow(ir_depth_images[i])
+        #     ax.scatter(contact_point[0], contact_point[1], color='r')
+        #     ax.scatter(edge_list_uv[:,0], edge_list_uv[:,1], color='b')
         # plt.show()
 
         # ################################
@@ -768,12 +792,13 @@ class PushSim(object):
         # plt.show()
         
                
-        # cropped_depth_images = ci.crop_images_parallel(depth_images, push_contact_list)
+        # cropped_depth_images = ci.crop_images_parallel(ir_depth_images, push_contact_list)
+        # cropped_segmasks = ci.crop_images_parallel(segmasks , push_contact_list)
         # fig = plt.figure(figsize=(10,10))
         # col = int(np.ceil(np.sqrt(self.num_envs)))
         # for i in range(self.num_envs):
         #     ax = fig.add_subplot(col,col,i+1)
-        #     ax.imshow(cropped_depth_images[i])
+        #     ax.imshow(cropped_depth_images[i] * cropped_segmasks[i])
         # plt.show()
         
         if self.save_results:
@@ -888,7 +913,7 @@ class PushSim(object):
                 # Save each pushing direction (network input)
                 with open(os.path.join(self.save_dir, 'velocity' + name), 'wb') as f:
                     np.save(f, np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
-                    # print(np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
+                    print(np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
 
                 # Save each label (network output)
                 with open(os.path.join(self.save_dir, 'label' + name), 'wb') as f:
@@ -936,13 +961,17 @@ class PushSim(object):
 
             segmask = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_SEGMENTATION)
             segmask = np.array(segmask, dtype = np.uint8) # for line contoured image
-            ir_depth_images.append(depth)
+            if np.max(depth) > 3:
+                ir_depth_images.append(depth_images[i])
+            else:
+                ir_depth_images.append(depth)
             segmasks.append(segmask)
             
         depth_images = np.array(depth_images) * -1
         ir_depth_images = np.array(ir_depth_images)
         segmasks = np.array(segmasks)
 
+        # save_dir = "~/catkin_ws/src"
         # depth_image1 = self.gym.get_camera_image(self.sim, self.envs[0], self.camera_handles[0], gymapi.IMAGE_DEPTH)
         # depth_image1 = np.array(depth_image1, dtype = np.float32)
         # # depth_image1 = cv2.resize(depth_image1, (1280, 720))
