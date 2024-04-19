@@ -21,8 +21,8 @@ args = parser.parse_args()
 var = args.var
 
 # Configure paths
-data_dir = "../data/tensors"
-save_dir = "../data/data_stats"
+data_dir = "../../data/tensors"
+save_dir = "../../data/data_stats"
 
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)

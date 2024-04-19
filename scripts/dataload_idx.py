@@ -2,14 +2,12 @@ import os
 import numpy as np
 import random
 import re
-import yaml
-
 
 # Get current file path
 current_file_path = os.path.dirname(os.path.realpath(__file__))
 
 # Data Directories
-DATA_DIR = os.path.abspath(os.path.join(current_file_path, '..', 'data'))
+DATA_DIR = os.path.abspath(os.path.join(current_file_path, '..', '..', 'data'))
 tensor_dir = DATA_DIR + '/tensors'
 save_dir = DATA_DIR + "/split"
 

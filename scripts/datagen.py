@@ -181,7 +181,7 @@ class PushSim(object):
         self.threshold_rot = sim_cfg["threshold_rot"]
         
         # Save directories
-        self.save_dir = "{}/../data/tensors".format(self.asset_dir)
+        self.save_dir = "{}/../../data/tensors".format(self.asset_dir)
         os.makedirs(os.path.join(self.save_dir), exist_ok=True)
         # Set the starting file index for saving the results
         self.init_file_idx = get_maximum_file_idx(self.save_dir)
