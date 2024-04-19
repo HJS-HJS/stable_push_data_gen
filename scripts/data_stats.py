@@ -41,22 +41,23 @@ dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 
 if var == "image":
     # Analyze image data
-    image_list = dataloader.load_image_tensor_parallel()
-    data       = np.array(image_list)
-    data       = np.mean(np.squeeze(data), axis=(1,2))
+    image_list        = dataloader.load_image_tensor_parallel()
+    image             = np.array(image_list)
+    image             = np.mean(np.squeeze(image), axis=(1,2))
+    mu_img, std_img   = np.mean(image), np.std(image)
     
 elif var == "masked_image":
     # Analyze masked_image data
     masked_image_list = dataloader.load_masked_image_tensor_parallel()
-    data              = np.array(masked_image_list)
-    data              = np.mean(np.squeeze(data), axis=(1,2))
+    masked_image      = np.array(masked_image_list)
+    masked_image      = np.mean(np.squeeze(masked_image), axis=(1,2))
+    mu_img, std_img   = np.mean(masked_image), np.std(masked_image)
     
 elif var == "velocity":
     # Analyze velocity data
-    velocity_list = dataloader.load_velocity_tensor_parallel()
-    data          = np.array(velocity_list)
-    
-mu_img, std_img = np.mean(data), np.std(data)
+    velocity_list   = dataloader.load_velocity_tensor_parallel()
+    data            = np.array(velocity_list)
+    mu_img, std_img = np.mean(data, axis=0), np.std(data, axis=0)
     
 # Store files
 np.save(os.path.join(save_dir, var + '_mean.npy'), mu_img)
