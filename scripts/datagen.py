@@ -739,7 +739,7 @@ class PushSim(object):
                 pcd_w = (np.matmul(self.camera_poses[0][:3,:3], pcd_object[:,:3].T) + self.camera_poses[0][:3,3].reshape(3,1)).T
                 max_height = np.max(pcd_w[:,2]) - (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.1
                 pcd_w = pcd_w[np.where(pcd_w[:,2] < max_height)[0]]
-                self.contact_heights.append(self.gripper_height + (np.max(pcd_w[:,2]) - self.gripper_height) * np.random.rand())
+                self.contact_heights.append(self.gripper_height + (np.max(pcd_w[:,2] * 0.9) - self.gripper_height) * np.random.rand())
         else:
             self.contact_heights = np.repeat(self.gripper_height, self.num_envs)
 
@@ -920,7 +920,7 @@ class PushSim(object):
                     
                 self.velocity_and_label_idx += 1
             print('Save velocity, label from ', self.init_file_idx + 1, 'to ', self.velocity_and_label_idx)
-            print(labels)
+        print(labels)
 
     def get_camera_image(self):
         """Get images from camera
