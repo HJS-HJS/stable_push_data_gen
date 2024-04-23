@@ -14,7 +14,7 @@ one type of trainind data among image, masked_image, and velocity.
 
 '''
 # Configure paths
-data_dir = "../../data/tensors"
+data_dir = "../../../data/tensors"
 visualize_num = 49
 
 # List all train data indices
