@@ -54,9 +54,6 @@ labels = np.array(label_list)
 # Flip train data
 flipped_images = np.flip(images, axis=2)
 flipped_masked_images = np.flip(masked_images, axis=2)
-print(images.shape)
-print(flipped_images.shape)
-print(data_max_idx)
 
 idx_list=[]
 
