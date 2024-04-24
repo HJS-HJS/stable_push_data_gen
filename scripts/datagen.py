@@ -242,7 +242,7 @@ class PushSim(object):
     def _create_viewer(self):
         ''' Create viewer '''
         
-        if self.headless != True:
+        if self.headless is True:
             self.viewer = None
         else:
             # Set viewer
@@ -278,6 +278,7 @@ class PushSim(object):
         
         # Set pusher pose
         pusher_pose = gymapi.Transform()
+        # pusher_pose.p = gymapi.Vec3(0,0,-1)
         pusher_pose.p = gymapi.Vec3(0,0,-1)
         pusher_pose.r = gymapi.Quat(0,0,0,1)
         
@@ -355,7 +356,7 @@ class PushSim(object):
             self.camera_handles.append(camera_handle)      
             self.camera_handles_l.append(camera_handle_assis)      
             
-            if not self.headless:
+            if self.headless:
                 self.gym.draw_viewer(self.viewer, self.sim, False)
             else:
                 self.gym.draw_viewer(self.viewer, self.sim, True)  
@@ -565,8 +566,7 @@ class PushSim(object):
             
             # Reset pusher pose (to default)
             pusher_pose = gymapi.Transform()
-            # pusher_pose.p = gymapi.Vec3(0, 0, -2)
-            pusher_pose.p = gymapi.Vec3(0,0,2)
+            pusher_pose.p = gymapi.Vec3(0,0,-1)
             pusher_pose.r = gymapi.Quat(0,0,0,1)
             
             pusher_rigid_body_handle = self.gym.find_actor_rigid_body_handle(self.envs[env_idx], self.pusher_actor_handles[env_idx], "base_link")
@@ -619,7 +619,7 @@ class PushSim(object):
         
         # step rendering
         self.gym.step_graphics(self.sim)
-        if not self.headless:
+        if self.headless:
             self.gym.draw_viewer(self.viewer, self.sim, False)
         else:
             self.gym.draw_viewer(self.viewer, self.sim, True)
@@ -744,17 +744,18 @@ class PushSim(object):
             self.contact_heights = np.repeat(self.gripper_height, self.num_envs)
 
         
-        # fig = plt.figure(figsize=(10,10))
-        # col = int(np.ceil(np.sqrt(self.num_envs)))
-        # for i in range(self.num_envs):
-        #     push_contact = push_contact_list[i]
-        #     edge_list_uv = push_contact.edge_uv
-        #     contact_point = push_contact.contact_points_uv[0]
-        #     ax = fig.add_subplot(col,col,i+1)
-        #     ax.imshow(ir_depth_images[i])
-        #     ax.scatter(contact_point[0], contact_point[1], color='r')
-        #     ax.scatter(edge_list_uv[:,0], edge_list_uv[:,1], color='b')
-        # plt.show()
+        fig = plt.figure(figsize=(10,10))
+        col = int(np.ceil(np.sqrt(self.num_envs)))
+        for i in range(self.num_envs):
+            push_contact = push_contact_list[i]
+            edge_list_uv = push_contact.edge_uv
+            contact_point = push_contact.contact_points_uv[0]
+            ax = fig.add_subplot(col,col,i+1)
+            ax.imshow(ir_depth_images[i])
+            ax.scatter(contact_point[0], contact_point[1], color='r')
+            ax.scatter(edge_list_uv[:,0], edge_list_uv[:,1], color='b')
+            ax.set_title('{}, {}'.format(self.contact_heights[i], self.contact_angles[i]*180/np.pi))
+        plt.show()
 
         # ################################
         # # Debugging for function speed #
@@ -865,7 +866,7 @@ class PushSim(object):
             
             if push_contact_list[env_idx] is None:
                 continue
-            if self.headless:
+            if not self.headless:
                 self.draw_viewer_trajectories(env_idx, np.concatenate((approach_trajectories[env_idx],pushing_trajectories[env_idx]), axis=0))
             
         print('move pusher to init position')
@@ -1066,7 +1067,7 @@ class PushSim(object):
         # step rendering
         self.gym.step_graphics(self.sim)
         
-        if not self.headless:
+        if self.headless:
             self.gym.draw_viewer(self.viewer, self.sim, False)
         else:
             self.gym.draw_viewer(self.viewer, self.sim, True)
@@ -1142,7 +1143,7 @@ class PushSim(object):
                 # Log the dof states
                 self.log_dof_states(waypoint_idx)
             
-            if not self.headless:
+            if self.headless:
                 self.gym.draw_viewer(self.viewer, self.sim, False)
             else:
                 self.gym.draw_viewer(self.viewer, self.sim, True)
