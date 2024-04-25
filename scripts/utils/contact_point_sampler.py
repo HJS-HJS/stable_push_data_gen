@@ -470,7 +470,7 @@ class ContactPointSampler(object):
         
         max_height = np.max(pcd_w[:,2]) - (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.1
         pcd_w = pcd_w[np.where(pcd_w[:,2] < max_height)[0]]
-        min_height = np.min(pcd_w[:,2]) + (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.2
+        min_height = np.min(pcd_w[:,2]) + (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.05
         pcd_w = pcd_w[np.where(pcd_w[:,2] > min_height)[0]]
         
         # fig = plt.figure()

@@ -58,11 +58,11 @@
       <mass value="0.05" />
       <inertia ixx="0.000016667" ixy="0" ixz="0" iyy="0.000016667" iyz="0" izz="0.000016667" />
     </inertial>
-    <visual>
+    <!-- <visual>
       <geometry>
         <box size="0.01 0.08 0.01"/>
       </geometry>
-    </visual>
+    </visual> -->
   </link>
 
   <joint name="eef" type="revolute">

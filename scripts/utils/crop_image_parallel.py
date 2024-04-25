@@ -90,10 +90,9 @@ def crop_image(depth_image, push_contact):
         
         return cropped_img   
 class CropImageParallel:
-    def __init__(self, num_envs, camera_intrinsic, gripper_width):
+    def __init__(self, num_envs, camera_intrinsic):
         self.num_envs = num_envs
         self.intrinsic = camera_intrinsic
-        self.gripper_width = gripper_width
         self.num_cores = multiprocessing.cpu_count()
     
     @staticmethod

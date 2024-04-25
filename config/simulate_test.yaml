@@ -7,7 +7,7 @@ simulation:
   compute_device_id: 0
   graphics_device_id: 0
   physics_engine: PHYSX
-  num_iters: 5
+  num_iters: 3
   num_envs: 120
   dt: 0.016667
   # camera: IntelRealSenseD415
@@ -29,13 +29,15 @@ simulation:
   # Push experiment setup
   push_speed: 0.1
   initial_distance: 0.1
-  translational_push_distance: 0.01 # 0.01
+  translational_push_distance: 0.03 # 0.01
   gripper_width: 0.08
-  gripper_height: 0.018
+  gripper_height: 0.02
   # gripper_height_max: 0.08
   gripper_angle: 90 # 0 ~ 90 [degree]
-  rand_height: True
+  rand_height: False
+  # rand_height: True
   rand_angle: True
+  rand_width: True
   env_space: [1.6, 0.8]
 
   # Slider setup
@@ -53,7 +55,7 @@ simulation:
 
   # Labeling threshold
   threshold_pos: 0.01 # meters
-  threshold_rot: 7 # degrees 15
+  threshold_rot: 15 # degrees 15
 
   # Friction coefficients
   pusher_friction_coefficient: 0.1

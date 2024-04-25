@@ -51,10 +51,12 @@ def linear_velocities(samples: int=2000) -> List[Union[float, float, float]]:
     Returns:
         List[Union[float, float, float]]: _description_
     """
-
     # log_radius = np.linspace(np.log10(1e-4), np.log10(100), samples)
     # log_radius = np.linspace(np.log10(1e-2), np.log10(10), samples)
-    log_radius = np.linspace(np.log10(1e-1), np.log10(10), samples)
+    # log_radius = np.linspace(np.log10(1e-1), np.log10(10), samples)
+    # log_radius = np.linspace(-1.5, np.log10(10), samples)
+    log_radius = np.linspace(-1.2, 0.5, samples)
+    # log_radius = np.linspace(np.log10(10), np.log10(100), samples)
     radius_positive = np.power(10, log_radius)
     radius = np.concatenate((np.flip(-radius_positive), radius_positive))
     icrs = np.vstack((radius, np.zeros_like(radius), np.ones_like(radius))).T
@@ -319,6 +321,30 @@ def evaluate_push_stability(eef_slider_pose_initial, eef_slider_pose_final, thre
     rel_positions = rel_poses[:,:3,3]
     rel_rotations_euler = R.from_matrix(rel_poses[:,:3,:3]).as_euler('xyz', degrees=True)
     
+    # for i in range(len(rel_positions)):
+    #     print(i+1,'pos: {:.4f}\trot: {:.4f}'.format(np.linalg.norm(rel_positions[i]), np.linalg.norm(np.abs(rel_rotations_euler[i]))))
+    #     is_close_position = np.all(np.linalg.norm(rel_positions[i]) < threshold_pos)
+    #     is_close_rotation = np.all(np.linalg.norm(rel_rotations_euler[i]) < threshold_rot)
+    #     print('\t', is_close_position, is_close_rotation)
+        # print('\t', rel_rotations_euler[i])
+
+    # print('[', end='')
+    # for i in range(len(rel_positions)):
+    #     is_close_position = np.all(np.abs(rel_positions[i]) < threshold_pos)
+    #     if is_close_position:
+    #         print('1', end=', ')
+    #     else:
+    #         print('0', end=', ')
+    # print(']')
+    # print('[', end='')
+    # for i in range(len(rel_positions)):
+    #     is_close_rotation = np.all(np.abs(rel_rotations_euler[i]) < threshold_rot)
+    #     if is_close_rotation:
+    #         print('1', end=', ')
+    #     else:
+    #         print('0', end=', ')
+    # print(']')
+
     # Label the results for all envs with the given threshold
     labels = []
     for i in range(len(rel_positions)):
