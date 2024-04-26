@@ -33,5 +33,6 @@ dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 label_list          = dataloader.load_label_tensor_parallel()
 labels              = np.array(label_list)
 
-print('True: {}\tFalse: {}\t Ratio: {:.2f}'.format(np.sum(labels), np.size(labels) - np.sum(labels), np.sum(labels)/np.size(labels)))
+print('True: {:.0f}\tFalse: {:.0f}\tTotal: {:.0f}\tRatio: {:.2f}'
+      .format(np.sum(labels), np.size(labels) - np.sum(labels), np.size(labels), np.sum(labels)/np.size(labels)))
 
