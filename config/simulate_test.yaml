@@ -7,8 +7,8 @@ simulation:
   compute_device_id: 0
   graphics_device_id: 0
   physics_engine: PHYSX
-  num_iters: 3
-  num_envs: 120
+  num_iters: 1
+  num_envs: 30
   dt: 0.016667
   # camera: IntelRealSenseD415
   camera: IntelRealSenseD415IR
@@ -28,7 +28,7 @@ simulation:
 
   # Push experiment setup
   push_speed: 0.1
-  initial_distance: 0.1
+  initial_distance: 0.05
   translational_push_distance: 0.03 # 0.01
   gripper_width: 0.08
   gripper_height: 0.02
@@ -43,7 +43,7 @@ simulation:
   # Slider setup
   slider_rand_position_offset: [0.15, 0.05] # [m, m] checked
   # slider_rand_position_offset: [-0.45, 0.3] # [m, m] checked
-  slider_rand_position_range: [0.4, 0.7] # [%, %]
+  slider_rand_position_range: [0.4, 0.5] # [%, %]
   # slider_rand_position_range: [0, 0] # [%, %]
   slider_rand_rotation_range: 180 # degrees 180
   camera_rand_position_range: 0 # meters 0.05

@@ -28,12 +28,8 @@ class SamplePushContactParallel:
         if len(push_contacts) == 0:
             selected_idx = 0
         else:
+            np.random.seed(env_idx)
             selected_idx = np.random.randint(0,len(push_contacts))
-        # selected_idx = np.random.randint(0,len(push_contacts)
-        # try:
-        #     push_contact = push_contacts[selected_idx]
-        # except:
-        #     print(gripper_width)
         push_contact = push_contacts[selected_idx]
         
         '''
@@ -45,9 +41,7 @@ class SamplePushContactParallel:
     
     def sample_push_contacts(self, depth_images, segmasks, camera_poses):
         push_contact_with_idx_list= parmap.starmap(self.sample_push_contact, 
-                                                #    list(zip(range(self.num_envs), depth_images, segmasks, camera_poses, repeat(self.intrinsic), repeat(self.gripper_width))))
                                                    list(zip(range(self.num_envs), depth_images, segmasks, camera_poses, repeat(self.intrinsic), self.gripper_width)))
-                                                #   pm_processes=self.num_cores, pm_chunksize = self.num_cores) #pm_processes=NUM_CORES, pm_pbar={"desc":"Sampling contact points..."}
         push_contact_with_idx_list = sorted(push_contact_with_idx_list, key=lambda x: list(x.keys())[0])
         push_contact_list = [list(contact_dict.values())[0] for contact_dict in push_contact_with_idx_list]
         

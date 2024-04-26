@@ -726,9 +726,9 @@ class PushSim(object):
         #     contact_point = push_contact.contact_points_uv[0]
         #     ax = fig.add_subplot(col,col,i+1)
         #     ax.imshow(ir_depth_images[i])
-        #     ax.scatter(contact_point[0], contact_point[1], color='r')
-        #     ax.scatter(edge_list_uv[:,0], edge_list_uv[:,1], color='b')
-        #     ax.set_title('{}, {}'.format(self.contact_heights[i], self.contact_angles[i]*180/np.pi))
+        #     ax.scatter(edge_list_uv[:,0], edge_list_uv[:,1], color='b', s=0.5)
+        #     ax.scatter(contact_point[0], contact_point[1], color='r', s=20)
+        #     ax.set_title('{:.4f}, {:.2f}'.format(self.gripper_width - self.gripper_widths[i], self.contact_angles[i]*180/np.pi))
         # plt.show()
 
         # ################################

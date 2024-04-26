@@ -193,6 +193,10 @@ class ContactPointSampler(object):
         # ax.arrow(contact_pair_centers_xy[0,0], contact_pair_centers_xy[0,1], pushing_directions[0,0], pushing_directions[0,1], width=0.001, color='r')
         # ax.set_aspect('equal')
         # plt.show()
+
+        eigen_value, eigen_vector = np.linalg.eig(np.cov(edge_list_xyz[:,0], edge_list_xyz[:,1]))
+        eigen_vector = eigen_vector[np.argmax(eigen_value)]
+        # eigen_vector = eigen_vector[np.argmin(eigen_value)]
         
         # ################
         # # Original way #   
@@ -204,9 +208,9 @@ class ContactPointSampler(object):
         #     if np.dot(reference_directions[i], pushing_directions[i]) < 0:
         #         pushing_directions[i] *= -1
                 
-        contact_pair_angles = np.rad2deg(np.arctan2(pushing_directions[:,1], pushing_directions[:,0]))
-        contact_pair_angles = np.where(contact_pair_angles < 0, contact_pair_angles + 360, contact_pair_angles)
-        # sorted_indices = np.where(np.abs(-150 - contact_pair_angles) < 10)[0]
+        # contact_pair_angles = np.rad2deg(np.arctan2(pushing_directions[:,1], pushing_directions[:,0]))
+        contact_pair_angles = np.rad2deg(np.arctan2(pushing_directions[:,1], pushing_directions[:,0])) - np.rad2deg(np.arctan2(eigen_vector[1], eigen_vector[0]))
+        contact_pair_angles %= 360
         
         sorted_indices = np.argsort(contact_pair_angles)
 
@@ -221,11 +225,17 @@ class ContactPointSampler(object):
                 sorted_idx.append(np.argmin(abs(contact_pair_angles - i / self.num_push_dirs * 360)))
         contact_points = []
         
-        np.random.shuffle(sorted_idx)
         for idx in sorted_idx:
             contact_points.append(ContactPoint(edge_list_xyz, edge_list_uv, contact_pair_xyz[idx], contact_pair_uv[idx], pushing_directions[idx]))
-        np.random.shuffle(contact_points)
         
+        # fig = plt.figure(figsize=(10,10))
+        # ax = fig.add_subplot(111)
+        # ax.scatter(edge_list_xyz[:,0], edge_list_xyz[:,1], c='k', marker='o')
+        # for idx in sorted_idx:
+        #     ax.arrow(contact_pair_centers_xy[idx,0], contact_pair_centers_xy[idx,1], pushing_directions[idx,0], pushing_directions[idx,1], width=0.001, color='r')
+        # ax.set_aspect('equal')
+        # plt.show()
+
         return contact_points
         
     def edge_detection(self, depth_image, segmask):
