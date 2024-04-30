@@ -29,7 +29,6 @@ max_index = indices[-1]
 # Load each type of train data
 dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 
-# random_args = np.random.choice(np.arange(max_index), size = visualize_num, replace=False)
 random_args = np.random.choice(np.arange(max_index), size = visualize_num)
 
 fig = plt.figure(figsize=(10,10))
@@ -45,9 +44,13 @@ velocities          = np.array(velocity_list)
 label_list          = dataloader.load_label_tensor_parallel()
 labels              = np.array(label_list)
 
+origin_images_list  = dataloader.load_tensor_parallel('masked_origin_image')
+origin_images       = np.array(origin_images_list)
+
 for i in range(visualize_num):
     ax = fig.add_subplot(col,col,i+1)
     # _temp_img = images[random_args[i]]
+    # _temp_img = origin_images[random_args[i]]
     _temp_img = masked_images[random_args[i]]
     ax.imshow(_temp_img.reshape(-1, _temp_img.shape[-1]))
     ax.set_title(velocities[i])
@@ -56,4 +59,3 @@ for i in range(visualize_num):
     else:
         ax.text(x=80, y=88, s=labels[i], fontsize=20, color='black')
 plt.show()
-
