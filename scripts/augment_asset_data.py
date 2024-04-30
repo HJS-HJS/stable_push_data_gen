@@ -107,10 +107,20 @@ def obj_to_urdf(asset_name):
         new_asset_path = os.path.join(assets_dir, target_name)
         
         # Create a scaling transformation matrix
-        scale_matrix = np.diag([np.random.choice(np.linspace(min_x_scale_factor,max_x_scale_factor,1000)), 
-                                np.random.choice(np.linspace(min_y_scale_factor,max_y_scale_factor,1000)), 
-                                1.0, 
-                                1.0])
+        if i < int(num_new_mesh/2):
+            max_scale_factor = max_x_scale_factor if max_x_scale_factor < max_y_scale_factor else max_y_scale_factor
+            min_scale_factor = min_x_scale_factor if min_x_scale_factor > min_y_scale_factor else min_y_scale_factor
+            scale_factor = np.random.choice(np.linspace(min_scale_factor,max_scale_factor,1000))
+            scale_matrix = np.diag([scale_factor, 
+                                    scale_factor, 
+                                    1.0, 
+                                    1.0])
+        else:
+            scale_matrix = np.diag([np.random.choice(np.linspace(min_x_scale_factor,max_x_scale_factor,1000)), 
+                                    np.random.choice(np.linspace(min_y_scale_factor,max_y_scale_factor,1000)), 
+                                    1.0, 
+                                    1.0])
+
 
         # Apply the scaling transformation to the mesh vertices
         new_mesh = copy.deepcopy(mesh)

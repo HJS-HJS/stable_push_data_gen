@@ -29,9 +29,9 @@ class SelectStablePose(object):
         for object in self.objects:
             self.current_object = object
             self.check_for_object()
-            if a % 11 == 0:
-                self.check_for_object()
-            a += 1
+            # if a % 11 == 0:
+                # self.check_for_object()
+            # a += 1
 
     def check_for_object(self):
         self.is_modified = False

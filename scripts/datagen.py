@@ -780,9 +780,10 @@ class PushSim(object):
             print("Saving network inputs...")
             cropped_depth_images = ci.crop_images_parallel(ir_depth_images, push_contact_list)
             cropped_segmasks = ci.crop_images_parallel(segmasks , push_contact_list)
+            cropped_origin_depth_images = ci.crop_images_parallel(depth_images , push_contact_list)
 
             for env_idx in range(self.num_envs):
-                cropped_depth_img, cropped_segmask = cropped_depth_images[env_idx], cropped_segmasks[env_idx]
+                cropped_depth_img, cropped_segmask, cropped_origin_depth_image = cropped_depth_images[env_idx], cropped_segmasks[env_idx], cropped_origin_depth_images[env_idx]
                 
                 ref_push_contact = push_contact_list[env_idx]
                     
@@ -798,6 +799,9 @@ class PushSim(object):
                         
                     with open(os.path.join(self.save_dir, 'masked_image' + name), 'wb') as f:
                         np.save(f, cropped_segmask * cropped_depth_img)
+
+                    with open(os.path.join(self.save_dir, 'masked_origin_image' + name), 'wb') as f:
+                        np.save(f, cropped_segmask * cropped_origin_depth_image)
                         
                 self.image_idx += 1
 

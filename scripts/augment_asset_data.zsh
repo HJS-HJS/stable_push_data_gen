@@ -8,7 +8,7 @@ MODULE_DIR=$(dirname $SCRIPT_DIR)
 # Absolute path to the directory where urdf is located
 URDF_DIR="$MODULE_DIR/assets/urdf"
 
-AUG_NUM=10
+AUG_NUM=5
 
 # Run python to convert mesh to urdf
 python3 $SCRIPT_DIR/augment_asset_data.py --num $AUG_NUM --urdf_dir $URDF_DIR
