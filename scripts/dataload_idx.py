@@ -43,7 +43,6 @@ with open (save_dir + "/test_indices.npy","wb") as f:
     np.save(f, test_indices)
 with open (save_dir + "/plot_indices.npy","wb") as f:
     np.save(f, plot_indices)
-    # np.save(f, test_indices)
     
 print("Train indices: ",train_indices)
 print("Val   indices: ",val_indices)

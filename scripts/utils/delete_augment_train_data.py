@@ -6,7 +6,7 @@ import numpy as np
 
 # Configure paths
 PATH = os.getcwd()
-data_dir = os.path.dirname(os.path.dirname(PATH)) + "/data/tensors"
+data_dir = os.path.dirname(os.path.dirname(PATH)) + "/../data/tensors"
 
 # List all train data indices
 FILE_NUM_ZERO_PADDING = 7

@@ -58,6 +58,13 @@ elif var == "velocity":
     velocity_list   = dataloader.load_velocity_tensor_parallel()
     data            = np.array(velocity_list)
     mu_img, std_img = np.mean(data, axis=0), np.std(data, axis=0)
+
+else:
+    # Analyze velocity data
+    image_tensor_list   = dataloader.load_tensor_parallel(var)
+    image               = np.array(image_tensor_list)
+    image               = np.mean(np.squeeze(image), axis=(1,2))
+    mu_img, std_img     = np.mean(image, axis=0), np.std(image, axis=0)
     
 # Store files
 np.save(os.path.join(save_dir, var + '_mean.npy'), mu_img)
