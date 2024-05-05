@@ -54,12 +54,17 @@ velocities = np.array(velocity_list)
 labels = np.array(label_list)
 origin_images = np.array(origin_image_list)
 
+# true velocity, labels
+velocities = velocities[np.where(labels==1)]
+labels = labels[np.where(labels==1)]
 # # Flip train data
 flipped_images = np.flip(images, axis=2)[np.where(labels==1)]
 flipped_masked_images = np.flip(masked_images, axis=2)[np.where(labels==1)]
 flipped_origin_images = np.flip(origin_images, axis=2)[np.where(labels==1)]
 
 print(np.sum(labels))
+print(velocities.shape)
+print(labels.shape)
 print(flipped_images.shape)
 print(flipped_masked_images.shape)
 print(flipped_origin_images.shape)
