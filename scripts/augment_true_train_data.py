@@ -48,19 +48,19 @@ file_list_velocity = [file for file in file_list if file.startswith('velocity')]
 file_list_labels = [file for file in file_list if file.startswith('label')]
 file_list_origin_image = [file for file in file_list if file.startswith('masked_origin_image')]
     
-images = np.squeeze(np.array(image_list), axis=1)
-masked_images = np.squeeze(np.array(masked_image_list), axis=1)
-velocities = np.array(velocity_list)
 labels = np.array(label_list)
-origin_images = np.array(origin_image_list)
 
-# true velocity, labels
-velocities = velocities[np.where(labels==1)]
+images = np.squeeze(np.array(image_list), axis=1)[np.where(labels==1)]
+masked_images = np.squeeze(np.array(masked_image_list), axis=1)[np.where(labels==1)]
+velocities = np.array(velocity_list)[np.where(labels==1)]
+origin_images = np.array(origin_image_list)[np.where(labels==1)]
+
+# true labels
 labels = labels[np.where(labels==1)]
 # # Flip train data
-flipped_images = np.flip(images, axis=2)[np.where(labels==1)]
-flipped_masked_images = np.flip(masked_images, axis=2)[np.where(labels==1)]
-flipped_origin_images = np.flip(origin_images, axis=2)[np.where(labels==1)]
+flipped_images = np.flip(images, axis=2)
+flipped_masked_images = np.flip(masked_images, axis=2)
+flipped_origin_images = np.flip(origin_images, axis=2)
 
 print(np.sum(labels))
 print(velocities.shape)
