@@ -19,11 +19,11 @@ DISH_LIST=($(ls $URDF_DIR))
 for dish in "${DISH_LIST[@]}"
 do
     # if [ $dish = 'takeout_cup_16oz' ] ; then
-    if [ $dish = 'takeout_cup_65oz_05' ] ; then
+    # if [ $dish = 'takeout_cup_65oz_05' ] ; then
     # if [ $dish = '38af522494d535151f6a5b0146bf3030' ] ; then
     # if [ $dish = '2eb4cfc59205bb3a147c505998f546dd' ] ; then
     # if [ $dish = 'Y6995_cerembowl_0' ] ; then
-    # if [ $dish = 'melamineware_g_0412' ] ; then
+    if [ $dish = 'melamineware_g_0412' ] ; then
     # if [ $dish = 'scan_dish_4' ] ; then
     # if [ $dish = 'mug_cup02' ] ; then
         sudo pkill python3

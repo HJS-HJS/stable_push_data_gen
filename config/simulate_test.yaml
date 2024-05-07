@@ -7,7 +7,7 @@ simulation:
   compute_device_id: 0
   graphics_device_id: 0
   physics_engine: PHYSX
-  num_iters: 5
+  num_iters: 1
   num_envs: 120
   dt: 0.016667
   # camera: IntelRealSenseD415
@@ -36,7 +36,8 @@ simulation:
   gripper_angle: 90 # 0 ~ 90 [degree]
   rand_height: False
   # rand_height: True
-  rand_angle: True
+  # rand_angle: True
+  rand_angle: False
   rand_width: True
   env_space: [1.6, 0.8]
 
