@@ -44,8 +44,8 @@ velocities          = np.array(velocity_list)
 label_list          = dataloader.load_label_tensor_parallel()
 labels              = np.array(label_list)
 
-origin_images_list  = dataloader.load_tensor_parallel('masked_origin_image')
-origin_images       = np.array(origin_images_list)
+# origin_images_list  = dataloader.load_tensor_parallel('masked_origin_image')
+# origin_images       = np.array(origin_images_list)
 
 for i in range(visualize_num):
     ax = fig.add_subplot(col,col,i+1)

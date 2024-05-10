@@ -5,7 +5,7 @@ import yaml
 import argparse
 
 # import isaacgym modules
-from isaacgym import gymapi
+from isaacgym import gymapi, terrain_utils
 
 # import 3rd party modules
 import numpy as np
@@ -23,8 +23,10 @@ from utils.ir_pattern import IRPattern
 class PushSim(object):
     def __init__(self):
         # set default push velocities
-        self.num_samples = 2000
-        self.network_inputs = fibonacci_lattice(self.num_samples)
+        self.num_samples = 200
+        # self.pushing_directions = fibonacci_sphere(self.num_samples * 2)
+        self.pushing_directions = linear_velocities(self.num_samples)
+        self.icrs = velocities2icrs(self.pushing_directions)
         
         # initialize gym
         self.gym = gymapi.acquire_gym()
@@ -46,7 +48,7 @@ class PushSim(object):
         self._create_viewer()
         self._create_light()
         self._create_environments()
-
+        
     def _load_configuration(self):
         ''' Configurate the entire simulation by conveying config data from configuration file '''
         ## Load args ############################################################################### 
@@ -93,9 +95,11 @@ class PushSim(object):
         self.gripper_width = sim_cfg["gripper_width"]
         # Gripper height
         self.gripper_height = sim_cfg["gripper_height"]
-        # Gripper angle
+        # Gripper height
         self.gripper_angle = np.deg2rad(sim_cfg["gripper_angle"] - 90) # (-90 ~ 0)
-        # Gripper angle random
+        # Gripper height
+        self.rand_height = sim_cfg["rand_height"]
+        # Gripper height
         self.rand_angle = sim_cfg["rand_angle"]
         # Environment size
         self.env_space = sim_cfg["env_space"]
@@ -295,6 +299,8 @@ class PushSim(object):
         self.pusher_actor_handles = []
         self.camera_handles = []
         self.camera_handles_l = []
+        self.contact_angles = []
+        self.contact_heights = []
         
         for env_idx in range(self.num_envs):
             # Create environment
@@ -354,6 +360,11 @@ class PushSim(object):
                 self.gym.draw_viewer(self.viewer, self.sim, False)
             else:
                 self.gym.draw_viewer(self.viewer, self.sim, True)  
+            
+        if self.rand_angle:
+            self.contact_angles = -np.pi/2 * np.random.rand(self.num_envs)
+        else:
+            self.contact_angles = np.repeat(self.gripper_angle, self.num_envs)
 
     # def __del__(self):
     #     if not self.headless:
@@ -525,23 +536,11 @@ class PushSim(object):
         # Reset camera poses
         self.reset_camera_poses()
         
-        # label and velocity set
-        self.label_idx = np.random.choice(np.arange(self.num_samples), size = self.num_envs, replace=False)
-        self.pusher_velocities = self.network_inputs[self.label_idx]
-        MAX_R = 0.5
-        MIN_R = -1.5
-        MAX_A = 90
-        MIN_A = 0
-        self.pusher_velocities[:,0] = np.sign(self.pusher_velocities[:,0]) * np.power(10, MIN_R + np.abs(self.pusher_velocities[:,0]) * (MAX_R - MIN_R))
-        if self.rand_angle:
-            self.pusher_velocities[:,1] = - np.pi / 2 * self.pusher_velocities[:,1]
-        else:
-            self.pusher_velocities[:,1] = np.repeat(self.gripper_angle, self.num_envs)
-
         if not self.headless:
             self.gym.clear_lines(self.viewer)
 
         for env_idx in range(self.num_envs):
+            
             
             # Reset slider friction coefficient
             rand_friction = self.friction_coefficients[np.random.randint(0, len(self.friction_coefficients))]
@@ -579,6 +578,8 @@ class PushSim(object):
             # Reset pusher DOF states to zero
             self.gym.set_actor_dof_states(self.envs[env_idx], self.pusher_actor_handles[env_idx], self.default_pusher_dof_state, gymapi.STATE_ALL)
             self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], [0, 0, 0, 0, 0])
+
+
             
     def step_simulation(self):
         ''' Step the simulation '''
@@ -592,7 +593,8 @@ class PushSim(object):
             
         # self.visualize_contacts(push_contact_list)
         # Get pushing results for the given push contacts (with or without simulation) and save results if needed
-        self.get_simulation_results(push_contact_list)
+        self.get_push_results(push_contact_list)
+        
         if self.image_idx != self.velocity_and_label_idx:
             print("Error: Data file mismatch. Data indexing is contaminated. \nAborting simulation.")
             exit()
@@ -675,6 +677,13 @@ class PushSim(object):
         # pcd_w = pcd_w[np.where(pcd_w[:,2] < max_height)[0]]
         # min_height = np.min(pcd_w[:,2]) + (np.max(pcd_w[:,2]) - np.min(pcd_w[:,2])) * 0.1
         # pcd_w = pcd_w[np.where(pcd_w[:,2] > min_height)[0]]
+        # if self.rand_height:
+        #     self.contact_heights = []
+        #     for i in range(self.num_envs):
+        #         self.contact_heights.append(self.gripper_height + (np.max(pcd_w[:,2] * 0.9) - self.gripper_height) * np.random.rand())
+        # else:
+        self.contact_heights = np.repeat(self.gripper_height, self.num_envs)
+        
         # fig = plt.figure()
         # ax = fig.add_subplot(111, projection='3d')
         # ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
@@ -771,11 +780,10 @@ class PushSim(object):
             print("Saving network inputs...")
             cropped_depth_images = ci.crop_images_parallel(ir_depth_images, push_contact_list)
             cropped_segmasks = ci.crop_images_parallel(segmasks , push_contact_list)
-            # cropped_origin_depth_images = ci.crop_images_parallel(depth_images , push_contact_list)
+            cropped_origin_depth_images = ci.crop_images_parallel(depth_images , push_contact_list)
 
             for env_idx in range(self.num_envs):
-                # cropped_depth_img, cropped_segmask, cropped_origin_depth_image = cropped_depth_images[env_idx], cropped_segmasks[env_idx], cropped_origin_depth_images[env_idx]
-                cropped_depth_img, cropped_segmask = cropped_depth_images[env_idx], cropped_segmasks[env_idx]
+                cropped_depth_img, cropped_segmask, cropped_origin_depth_image = cropped_depth_images[env_idx], cropped_segmasks[env_idx], cropped_origin_depth_images[env_idx]
                 
                 ref_push_contact = push_contact_list[env_idx]
                     
@@ -791,6 +799,9 @@ class PushSim(object):
                         
                     with open(os.path.join(self.save_dir, 'masked_image' + name), 'wb') as f:
                         np.save(f, cropped_segmask * cropped_depth_img)
+
+                    with open(os.path.join(self.save_dir, 'masked_origin_image' + name), 'wb') as f:
+                        np.save(f, cropped_segmask * cropped_origin_depth_image)
                         
                 self.image_idx += 1
 
@@ -803,8 +814,23 @@ class PushSim(object):
                     
         print('Save network inputs from ', self.init_file_idx + 1, 'to ', self.image_idx)
         return push_contact_list
-       
-    def get_simulation_results(self, push_contact_list):
+    
+    def get_push_results(self, push_contact_list):
+        ''' Get pushing results for the given push contacts (with or without simulation) and save results if needed
+        
+        - Using simulation:
+            - Simulate the pushing for all the environments
+            - Save the results if needed
+
+        '''
+        # Get random pushing directions
+        random_args = np.random.choice(np.arange(self.num_samples * 2), size = self.num_envs, replace=False)
+        icrs = self.icrs[random_args]
+        pushing_directions = self.pushing_directions[random_args]
+        
+        self.get_simulation_results(push_contact_list, icrs, pushing_directions)
+   
+    def get_simulation_results(self, push_contact_list, icrs, pushing_directions):
         
         # Relocate pushers' pose to the contact points
         self.relocate_pusher(push_contact_list)
@@ -812,7 +838,7 @@ class PushSim(object):
         print('calculate trajectories')
         # Approach the pusher to the slider 
         approach_trajectories = get_approach_trajectories(self.initial_distance + self.translational_push_distance, self.push_speed, self.dt, self.num_envs)
-        pushing_trajectories = icrs2trajectories(self.pusher_velocities[:,0], self.initial_distance + self.translational_push_distance, self.push_speed, self.dt)
+        pushing_trajectories = icrs2trajectories(icrs, self.initial_distance + self.translational_push_distance, self.push_speed, self.dt)
 
         for env_idx in range(self.num_envs):
             
@@ -857,7 +883,6 @@ class PushSim(object):
         # Evaluate the push
         print('evaluate the push')
         
-        network_input = self.network_inputs[self.label_idx]
         labels = evaluate_push_stability(eef_slider_poses_initial, eef_slider_poses_final, self.threshold_pos, self.threshold_rot)
         # self.gym.clear_lines(self.viewer)
         # save data
@@ -873,7 +898,10 @@ class PushSim(object):
                 
                 # Save each pushing direction (network input)
                 with open(os.path.join(self.save_dir, 'velocity' + name), 'wb') as f:
-                    np.save(f, np.array([network_input[env_idx][0], network_input[env_idx][1], self.gripper_width - self.gripper_widths[env_idx]]))
+                    # np.save(f, np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
+                    # print(np.array([pushing_directions[env_idx][0], self.contact_heights[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
+                    np.save(f, np.array([pushing_directions[env_idx][0], self.gripper_width - self.gripper_widths[env_idx], np.pi/2 + self.contact_angles[env_idx]]))
+                    # print(np.array([pushing_directions[env_idx][0], self.gripper_width - self.gripper_widths[env_idx], 90 + np.rad2deg(self.contact_angles[env_idx])]))
 
                 # Save each label (network output)
                 with open(os.path.join(self.save_dir, 'label' + name), 'wb') as f:
@@ -884,13 +912,13 @@ class PushSim(object):
         print(labels)
         # _temp = 0
         # while _temp < 50:
-        # while True:
+        # # while True:
         #     self.gym.simulate(self.sim)
         #     self.gym.fetch_results(self.sim, True)
         #     self.gym.step_graphics(self.sim)
         #     self.gym.draw_viewer(self.viewer, self.sim, True)
+        #     _temp += 1
         #     time.sleep(0.02)
-        #     # _temp += 1
 
     def get_camera_image(self):
         """Get images from camera
@@ -926,7 +954,7 @@ class PushSim(object):
             color_image[np.where(depth_image)] = (color_image[np.where(depth_image)] + 1) * 1.5
             color_image_l[np.where(depth_image_l)] = (color_image_l[np.where(depth_image_l)] + 1) * 1.5
 
-            depth = IRPattern.img_to_depth(color_image, color_image_l, self.camera_intrinsic)
+            depth = img_to_depth(color_image, color_image_l, self.camera_intrinsic)
 
             segmask = self.gym.get_camera_image(self.sim, self.envs[i], self.camera_handles[i], gymapi.IMAGE_SEGMENTATION)
             segmask = np.array(segmask, dtype = np.uint8) # for line contoured image
@@ -1026,7 +1054,7 @@ class PushSim(object):
             # pusher_rot = R.from_euler('xyz', [0, self.contact_angles[env_idx], push_angl_z], degrees=False).as_quat()
             
             new_pusher_pose = gymapi.Transform()
-            new_pusher_pose.p = gymapi.Vec3(pusher_pos_xy[0], pusher_pos_xy[1], self.gripper_height)
+            new_pusher_pose.p = gymapi.Vec3(pusher_pos_xy[0], pusher_pos_xy[1], self.contact_heights[env_idx])
             new_pusher_pose.r = gymapi.Quat(pusher_rot[0], pusher_rot[1], pusher_rot[2], pusher_rot[3])
             
             pusher_rigid_body_handle = self.gym.get_actor_rigid_body_handle(self.envs[env_idx], self.pusher_actor_handles[env_idx],0)
@@ -1097,7 +1125,7 @@ class PushSim(object):
         for waypoint_idx, waypoint in enumerate(waypoints):
             for env_idx in range(self.num_envs):
                 # self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], np.concatenate((np.append(waypoint[env_idx], self.contact_angles[env_idx]), _width)).astype(np.float32))
-                self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], np.hstack([waypoint[env_idx], self.pusher_velocities[env_idx,1], -self.gripper_widths[env_idx]/2, -self.gripper_widths[env_idx]/2]).astype(np.float32))
+                self.gym.set_actor_dof_position_targets(self.envs[env_idx], self.pusher_actor_handles[env_idx], np.hstack([waypoint[env_idx], self.contact_angles[env_idx], -self.gripper_widths[env_idx]/2, -self.gripper_widths[env_idx]/2]).astype(np.float32))
                     
             # Step the physics
             self.gym.simulate(self.sim)

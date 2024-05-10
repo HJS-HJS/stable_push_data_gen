@@ -42,6 +42,24 @@ def fibonacci_sphere(samples: int=2000) -> List[Union[float, float, float]]:
         points.append((x, y, z))
     return np.array(points)
 
+def fibonacci_lattice(samples: int=2000) -> List[Union[float, float]]:
+    """generate ICR in fibonacci lattice
+
+    Args:
+        samples (int, optional): Number to make lattice velocity samples. Defaults to 2000.
+
+    Returns:
+        List[Union[float, float]]: Velocities list with [x, y, z]
+    """
+    points = []
+    phi = (1. + np.sqrt(5.)) / 2.  # golden angle in radians
+
+    for i in range(samples):
+        x = 1. - 2. * ((i / phi) % 1.)
+        y = i / (samples - 1)
+        points.append((x, y))
+    return np.array(points)
+
 def linear_velocities(samples: int=2000) -> List[Union[float, float, float]]:
     """_summary_
 
@@ -56,7 +74,8 @@ def linear_velocities(samples: int=2000) -> List[Union[float, float, float]]:
     # log_radius = np.linspace(np.log10(1e-1), np.log10(10), samples)
     # log_radius = np.linspace(-1.5, np.log10(10), samples)
     # log_radius = np.linspace(-1.2, 0.5, samples)
-    log_radius = np.linspace(-1.5, 0.5, samples)
+    # log_radius = np.linspace(2, 2.1, samples) # line
+    log_radius = np.linspace(-1.5, 0.5, samples//2) # generate data
     # log_radius = np.linspace(np.log10(10), np.log10(100), samples)
     radius_positive = np.power(10, log_radius)
     radius = np.concatenate((np.flip(-radius_positive), radius_positive))
@@ -177,13 +196,13 @@ def direction2icr(direction):
         y =  Vx/w
         return np.array([x, y])
     
-def icrs2trajectories(icrs, approach_distance, push_speed, dt):
+def icrs2trajectories(icrs, approach_distance, push_speed, dt, push_distance: float=0.15):
 
     ''' Convert ICRs to trajectories with constant ICR for all envs
     
     Input: 
     
-        - ICRs in gripper frame (x, y)
+        - ICRs in gripper frame (x)
         - approach_distance (float): Initial approach distance in meters (identical for all envs)
         - push_speed (float): Pushing speed in meters per second (identical for all envs)
         - dt (float): Time step in seconds (identical for all envs)
@@ -197,7 +216,7 @@ def icrs2trajectories(icrs, approach_distance, push_speed, dt):
     '''
     
     # push_distance = 0.05 # m, 0.05*pi
-    push_distance = 0.15 # m
+    # push_distance = 0.15 # m
     # push_distance = 0.1 # m
     # push_distance = 0.3 # m
     # push_distance = 0.5 # m
@@ -206,11 +225,10 @@ def icrs2trajectories(icrs, approach_distance, push_speed, dt):
     push_time = push_distance / push_speed
     push_timesteps = int(push_time / dt)
     
-    
     joint_trajectories = []
     for icr in icrs:
         
-        x0, y0 = icr[0], icr[1]
+        x0, y0 = 0, icr
         alpha = np.arctan2(-y0,-x0)
         r = np.sqrt(x0**2 + y0**2)
         # Left - hand side ICR

@@ -17,11 +17,14 @@ DISH_LIST=($(ls $URDF_DIR))
 
 # Iterate over the array and run the Python script with different files
 dish_order=1
+dish_start=0
 
 for dish in "${DISH_LIST[@]}"
 do
-    echo "#$dish_order / ${#DISH_LIST[*]}"
-    python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
-    # python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
+    if [ ${dish_order} -ge ${dish_start} ] ; then
+        echo "#$dish_order / ${#DISH_LIST[*]}"
+        python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
+        # python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
+    fi
     ((dish_order+=1))
 done

@@ -60,7 +60,7 @@ elif var == "velocity":
     mu_img, std_img = np.mean(data, axis=0), np.std(data, axis=0)
 
 else:
-    # Analyze velocity data
+    # Analyze other image data
     image_tensor_list   = dataloader.load_tensor_parallel(var)
     image               = np.array(image_tensor_list)
     image               = np.mean(np.squeeze(image), axis=(1,2))
