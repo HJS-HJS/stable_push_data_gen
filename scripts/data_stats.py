@@ -40,10 +40,19 @@ dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 
 if var == "image":
     # Analyze image data
+    print("dataloader")
     image_list        = dataloader.load_image_tensor_parallel()
+    print(type(image_list))
     image             = np.array(image_list)
+    print(type(image))
     image             = np.mean(np.squeeze(image), axis=(1,2))
-    mu_img, std_img   = np.mean(image), np.std(image)
+    print(type(image))
+    mu_img            = np.mean(image)
+    print(mu_img)
+    np.save(os.path.join(save_dir, var + '_mean.npy'), mu_img)
+    std_img           = np.std(image)
+    print(std_img)
+    np.save(os.path.join(save_dir, var + '_std.npy'), std_img)
     
 elif var == "masked_image":
     # Analyze masked_image data
