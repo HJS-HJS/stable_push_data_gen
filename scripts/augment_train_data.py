@@ -38,7 +38,7 @@ image_list = dataloader.load_image_tensor_parallel()
 masked_image_list = dataloader.load_masked_image_tensor_parallel()
 velocity_list = dataloader.load_velocity_tensor_parallel()
 label_list = dataloader.load_label_tensor_parallel()
-origin_image_list = dataloader.load_tensor_parallel("masked_origin_image")
+# origin_image_list = dataloader.load_tensor_parallel("masked_origin_image")
 
 
 # Get file list by each field
@@ -46,18 +46,18 @@ file_list_image = [file for file in file_list if file.startswith('image')]
 file_list_masked_image = [file for file in file_list if file.startswith('masked_image')]
 file_list_velocity = [file for file in file_list if file.startswith('velocity')]
 file_list_labels = [file for file in file_list if file.startswith('label')]
-file_list_origin_image = [file for file in file_list if file.startswith('masked_origin_image')]
+# file_list_origin_image = [file for file in file_list if file.startswith('masked_origin_image')]
     
 images = np.squeeze(np.array(image_list), axis=1)
 masked_images = np.squeeze(np.array(masked_image_list), axis=1)
 velocities = np.array(velocity_list)
 labels = np.array(label_list)
-origin_images = np.array(origin_image_list)
+# origin_images = np.array(origin_image_list)
 
 # # Flip train data
 flipped_images = np.flip(images, axis=2)
 flipped_masked_images = np.flip(masked_images, axis=2)
-flipped_origin_images = np.flip(origin_images, axis=2)
+# flipped_origin_images = np.flip(origin_images, axis=2)
 
 # print(data_max_idx)
 
@@ -76,9 +76,9 @@ def save_data(idx):
     with open(os.path.join(train_data_dir, 'label' + name), 'wb') as f:
         np.save(f, labels[idx])
 
-    with open(os.path.join(train_data_dir, 'masked_origin_image' + name), 'wb') as f:
-        np.save(f, flipped_origin_images[idx])
+    # with open(os.path.join(train_data_dir, 'masked_origin_image' + name), 'wb') as f:
+        # np.save(f, flipped_origin_images[idx])
 
 num_cores = multiprocessing.cpu_count()
-parmap.map(save_data, range(len(flipped_origin_images)), pm_pbar={'desc': 'Saving flipped data'}, pm_processes=num_cores, pm_chunksize=num_cores)
-print('convert ', len(flipped_origin_images), 'data')
+parmap.map(save_data, range(len(flipped_masked_images)), pm_pbar={'desc': 'Saving flipped data'}, pm_processes=num_cores, pm_chunksize=num_cores)
+print('convert ', len(flipped_masked_images), 'data')
