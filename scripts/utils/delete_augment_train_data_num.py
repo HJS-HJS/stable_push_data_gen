@@ -4,7 +4,7 @@ import parmap
 import multiprocessing
 import numpy as np
 
-DELETE_NUM = 70000
+DELETE_NUM = 3261
 
 # Configure paths
 PATH = os.getcwd()
@@ -41,8 +41,14 @@ def delete_data(idx):
     except:
         # print("cant delete {}".format(idx + 1))
         pass
-    os.remove(data_dir + '/velocity' + name)
-    os.remove(data_dir + '/label' + name)
+    try:
+        os.remove(data_dir + '/velocity' + name)
+    except:
+        pass
+    try:
+        os.remove(data_dir + '/label' + name)
+    except:
+        pass
 
 num_cores = multiprocessing.cpu_count()
 parmap.map(delete_data, range(max_index), pm_pbar={'desc': 'Saving flipped data'}, pm_processes=num_cores, pm_chunksize=num_cores)
