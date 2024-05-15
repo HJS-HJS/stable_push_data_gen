@@ -4,11 +4,12 @@ import parmap
 import multiprocessing
 import numpy as np
 
-DELETE_IDX = 168469
+DELETE_NUM = 70000
 
 # Configure paths
 PATH = os.getcwd()
-data_dir = os.path.dirname(os.path.dirname(PATH)) + "/../data/tensors"
+data_dir = os.path.dirname(os.path.dirname(os.path.dirname(PATH))) + "/data/tensors"
+print(data_dir)
 
 # List all train data indices
 FILE_NUM_ZERO_PADDING = 7
@@ -21,17 +22,29 @@ max_index = int(indices[-1])
 
 print('total data {}'.format(max_index))
 
+image_list = []
+image_list = []
+image_list = []
+image_list = []
+
 def delete_data(idx):
-    if idx < (max_index - DELETE_IDX):
+    if idx < (max_index - DELETE_NUM):
         return
     name = ("_%0" + str(FILE_NUM_ZERO_PADDING) + 'd.npy')%(idx + 1)
-    os.remove(data_dir + '/image' + name)
-    os.remove(data_dir + '/masked_image' + name)
-    os.remove(data_dir + '/masked_origin_image' + name)
+    try: 
+        os.remove(data_dir + '/image' + name)
+    except:
+        # print("cant delete {}".format(idx + 1))
+        pass
+    try: 
+        os.remove(data_dir + '/masked_image' + name)
+    except:
+        # print("cant delete {}".format(idx + 1))
+        pass
     os.remove(data_dir + '/velocity' + name)
     os.remove(data_dir + '/label' + name)
 
 num_cores = multiprocessing.cpu_count()
 parmap.map(delete_data, range(max_index), pm_pbar={'desc': 'Saving flipped data'}, pm_processes=num_cores, pm_chunksize=num_cores)
 
-print('delete {} from {} data {}'.format(DELETE_IDX, max_index, max_index - DELETE_IDX))
+print('delete {} from {} data {}'.format(DELETE_NUM, max_index, max_index - DELETE_NUM))

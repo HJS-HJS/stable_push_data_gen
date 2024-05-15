@@ -31,7 +31,6 @@ if not os.path.exists(save_dir):
 FILE_NUM_ZERO_PADDING = 7
 file_list = os.listdir(data_dir)
 file_list = [file for file in file_list if file.endswith('.npy')]
-file_list_image = [file for file in file_list if file.startswith('image')]
 indices = [int(re.findall(r'\d+', file_name)[0]) for file_name in file_list]
 indices = np.sort(indices)
 max_index = indices[-1]
