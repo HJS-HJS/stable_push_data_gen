@@ -41,9 +41,10 @@ dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 if var == "image":
     # Analyze image data
     print("dataloader")
-    image_list        = dataloader.load_image_tensor_parallel()
-    print(type(image_list))
-    image             = np.array(image_list)
+    # image_list        = dataloader.load_image_tensor_parallel()
+    # print(type(image_list))
+    # image             = np.array(image_list)
+    image        = np.array(dataloader.load_image_tensor_parallel())
     print(type(image))
     image             = np.mean(np.squeeze(image), axis=(1,2))
     print(type(image))
