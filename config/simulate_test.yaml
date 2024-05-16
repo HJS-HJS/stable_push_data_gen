@@ -1,6 +1,6 @@
 simulation:
   # simulation environment setup
-  num_threads : 10
+  num_threads : 12
   FILE_ZERO_PADDING_NUM: 7
   use_gpu: True
   use_gpu_pipeline : False
@@ -17,11 +17,7 @@ simulation:
   # Asset setup
   # slider(dish mesh)
   slider_dataset: urdf
-  # slider_name: takeout_cup_65oz
-  # slider_name: bowl_0005
-  # slider_name: melamineware_g_0001
   slider_name: mug_cup02
-  # slider_name: scan_dish_4
   # Pusher
   pusher_dataset: pusher_urdf
   pusher_name: pusher_vertical
@@ -34,17 +30,14 @@ simulation:
   gripper_height: 0.02
   # gripper_height_max: 0.08
   gripper_angle: 90 # 0 ~ 90 [degree]
-  rand_height: False
-  # rand_height: True
-  # rand_angle: True
-  rand_angle: False
+  rand_angle: True
   rand_width: True
   env_space: [1.6, 0.8]
 
   # Slider setup
   slider_rand_position_offset: [0.15, 0.05] # [m, m] checked
   # slider_rand_position_offset: [-0.45, 0.3] # [m, m] checked
-  slider_rand_position_range: [0.4, 0.5] # [%, %]
+  slider_rand_position_range: [0.3, 0.4] # [%, %]
   # slider_rand_position_range: [0, 0] # [%, %]
   slider_rand_rotation_range: 180 # degrees 180
   camera_rand_position_range: 0 # meters 0.05
