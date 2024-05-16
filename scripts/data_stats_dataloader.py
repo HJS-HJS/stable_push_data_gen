@@ -38,11 +38,19 @@ max_index = indices[-1]
 # Load each type of train data
 dataloader = DataLoaderParallel(max_index, data_dir, FILE_NUM_ZERO_PADDING)
 
-if (var == "image") or (var == "masked_image"):
+if var == "image":
     # Analyze image data
-    mean_list = dataloader.load_mean_tensor_parallel(var)
-    mean_list = np.array(mean_list)
-    mu_img, std_img   = np.mean(mean_list), np.std(mean_list)
+    image_list        = dataloader.load_image_tensor_parallel()
+    image             = np.array(image_list)
+    image             = np.mean(np.squeeze(image), axis=(1,2))
+    mu_img, std_img   = np.mean(image), np.std(image)
+    
+elif var == "masked_image":
+    # Analyze masked_image data
+    masked_image_list = dataloader.load_masked_image_tensor_parallel()
+    masked_image      = np.array(masked_image_list)
+    masked_image      = np.mean(np.squeeze(masked_image), axis=(1,2))
+    mu_img, std_img   = np.mean(masked_image), np.std(masked_image)
     
 elif var == "velocity":
     # Analyze velocity data
