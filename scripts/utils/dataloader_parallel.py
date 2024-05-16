@@ -207,7 +207,5 @@ class DataLoaderParallel(Dataset):
                                               repeat(self.file_zero_padding_num),
                                               repeat(label))),
                                      pm_processes = num_workers, pm_chunksize = num_workers, pm_pbar = {'desc':'Loading ' + label + ' tensor...'})
-        
-        print(type(mean_list))
 
         return mean_list

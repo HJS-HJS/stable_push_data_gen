@@ -42,21 +42,22 @@ if (var == "image") or (var == "masked_image"):
     # Analyze image data
     mean_list = dataloader.load_mean_tensor_parallel(var)
     mean_list = np.array(mean_list)
-    mu_img, std_img   = np.mean(mean_list), np.std(mean_list)
+    _mean, _std   = np.mean(mean_list), np.std(mean_list)
     
 elif var == "velocity":
     # Analyze velocity data
     velocity_list   = dataloader.load_velocity_tensor_parallel()
     data            = np.array(velocity_list)
-    mu_img, std_img = np.mean(data, axis=0), np.std(data, axis=0)
+    _mean, _std = np.mean(data, axis=0), np.std(data, axis=0)
 
 else:
     # Analyze other image data
     image_tensor_list   = dataloader.load_tensor_parallel(var)
     image               = np.array(image_tensor_list)
     image               = np.mean(np.squeeze(image), axis=(1,2))
-    mu_img, std_img     = np.mean(image, axis=0), np.std(image, axis=0)
+    _mean, _std     = np.mean(image, axis=0), np.std(image, axis=0)
     
 # Store files
-np.save(os.path.join(save_dir, var + '_mean.npy'), mu_img)
-np.save(os.path.join(save_dir, var + '_std.npy'), std_img)
+print("save {} data ({}, {})".format(var, _mean, _std))
+np.save(os.path.join(save_dir, var + '_mean.npy'), _mean)
+np.save(os.path.join(save_dir, var + '_std.npy'), _std)
