@@ -25,13 +25,13 @@ maximum_number = np.max(numbers)
 indices = [i for i in range(maximum_number)]
 random.shuffle(indices)
 
-train_indices = np.array(indices[:int(maximum_number*0.6)])
-val_indices = np.array(indices[int(maximum_number*0.6):int(maximum_number*0.8)])
-test_indices = np.array(indices[int(maximum_number*0.8):])
+# train_indices = np.array(indices[:int(maximum_number*0.6)])
+# val_indices = np.array(indices[int(maximum_number*0.6):int(maximum_number*0.8)])
+# test_indices = np.array(indices[int(maximum_number*0.8):])
 
-# train_indices = np.array(indices[:int(maximum_number*0.75)])
-# val_indices = np.array(indices[int(maximum_number*0.75):int(maximum_number*0.99)])
-# test_indices = np.array(indices[int(maximum_number*0.99):])
+train_indices = np.array(indices[:int(maximum_number*0.75)])
+val_indices = np.array(indices[int(maximum_number*0.75):int(maximum_number*0.99)])
+test_indices = np.array(indices[int(maximum_number*0.99):])
 
 plot_indices  = np.arange(maximum_number)
 
