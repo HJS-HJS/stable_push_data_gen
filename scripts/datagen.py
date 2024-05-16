@@ -97,6 +97,8 @@ class PushSim(object):
         self.gripper_angle = np.deg2rad(sim_cfg["gripper_angle"] - 90) # (-90 ~ 0)
         # Gripper angle random
         self.rand_angle = sim_cfg["rand_angle"]
+        # Gripper width random
+        self.rand_width = sim_cfg["rand_width"]
         # Environment size
         self.env_space = sim_cfg["env_space"]
         
@@ -177,7 +179,8 @@ class PushSim(object):
         self.threshold_rot = sim_cfg["threshold_rot"]
         
         # Save directories
-        self.save_dir = "{}/../../data/tensors".format(self.asset_dir)
+        # self.save_dir = "{}/../../data/tensors".format(self.asset_dir)
+        self.save_dir = "{}/../../data_add/tensors".format(self.asset_dir)
         os.makedirs(os.path.join(self.save_dir), exist_ok=True)
         # Set the starting file index for saving the results
         self.init_file_idx = get_maximum_file_idx(self.save_dir)
@@ -680,19 +683,26 @@ class PushSim(object):
         # ax.scatter(pcd_w[:, 0], pcd_w[:, 1], pcd_w[:, 2])
         # plt.show()
 
-        _width_iter = 4
-        self.gripper_widths = (np.random.rand(self.num_envs) * _width_iter / 4 + (4 - _width_iter) / 4) * self.gripper_width / 2
-        while _width_iter > 0:
-            try:
-                spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, self.gripper_width - self.gripper_widths)
-                print("Sampling push contacts in range {}, {}".format(self.gripper_width * (4+_width_iter) / 8, self.gripper_width/2))
-                push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
-                print("Generate contact points")
-                break
-            except:
-                _width_iter -= 1
-                self.gripper_widths = (np.random.rand(self.num_envs) * _width_iter / 4 + (4 - _width_iter) / 4) * self.gripper_width / 2
-                print("Re", end="")
+        if self.rand_width:
+            _width_iter = 4
+            self.gripper_widths = (np.random.rand(self.num_envs) * _width_iter / 4 + (4 - _width_iter) / 4) * self.gripper_width / 2
+            while _width_iter > 0:
+                try:
+                    spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, self.gripper_width - self.gripper_widths)
+                    print("Sampling push contacts in range {}, {}".format(self.gripper_width * (4+_width_iter) / 8, self.gripper_width/2))
+                    push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
+                    print("Generate contact points")
+                    break
+                except:
+                    _width_iter -= 1
+                    self.gripper_widths = (np.random.rand(self.num_envs) * _width_iter / 4 + (4 - _width_iter) / 4) * self.gripper_width / 2
+                    print("Re", end="")
+        else:
+            self.gripper_widths = np.repeat(self.gripper_width, self.num_envs)
+            spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, self.gripper_width - self.gripper_widths)
+            print("Sampling push contacts in range {}, {}".format(self.gripper_width * (4+_width_iter) / 8, self.gripper_width/2))
+            push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
+            print("Generate contact points")
 
         # sample a contact point
         # self._gripper_width_change = 0
@@ -883,7 +893,7 @@ class PushSim(object):
             print('Save velocity, label from ', self.init_file_idx + 1, 'to ', self.velocity_and_label_idx)
         print(labels)
         # _temp = 0
-        # while _temp < 50:
+        # # while _temp < 50:
         # while True:
         #     self.gym.simulate(self.sim)
         #     self.gym.fetch_results(self.sim, True)
@@ -1076,6 +1086,31 @@ class PushSim(object):
         
         poses = np.array(poses)
         return poses
+    
+    def get_slider_pose(self):
+        
+        ''' Get the pose of the slider in pusher's end-effector frame for all envs
+    
+        Output: 
+        - poses (num_envs, 4x4)
+    
+        '''
+        poses = []
+        
+        for env_idx in range(self.num_envs):
+            
+            # Get slider poses of all envs
+            slider_handle = self.gym.get_actor_rigid_body_handle(self.envs[env_idx], self.slider_actor_handles[env_idx], 0)
+            slider_pose_rigid_transform = self.gym.get_rigid_transform(self.envs[env_idx], slider_handle)
+            slider_pose = tmat(slider_pose_rigid_transform)
+            
+            poses.append(slider_pose)
+        
+        poses = np.array(poses)
+        guassian_pose = R.from_matrix(poses[:,:3,:3]).as_euler("xyz", degrees=True)
+        # print(guassian_pose)
+
+        return guassian_pose[:,:2]
     
     def move_pusher(self, joint_trajectories, logging=False):
         ''' Move the pusher in a given trajectory with position PD control (default Isaac Gym control method)
