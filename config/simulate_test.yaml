@@ -31,7 +31,7 @@ simulation:
   # gripper_height_max: 0.08
   gripper_angle: 90 # 0 ~ 90 [degree]
   rand_angle: True
-  rand_width: True
+  rand_width: False
   env_space: [1.6, 0.8]
 
   # Slider setup
