@@ -700,7 +700,7 @@ class PushSim(object):
         else:
             self.gripper_widths = np.repeat(self.gripper_width, self.num_envs)
             spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, self.gripper_width - self.gripper_widths)
-            print("Sampling push contacts in range {}, {}".format(self.gripper_width * (4+_width_iter) / 8, self.gripper_width/2))
+            print("Sampling push contacts {}".format(self.gripper_width))
             push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
             print("Generate contact points")
 
