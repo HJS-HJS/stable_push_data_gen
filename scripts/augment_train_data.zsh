@@ -8,7 +8,7 @@ MODULE_DIR=$(dirname $SCRIPT_DIR)
 # Path where mesh files are located
 CONFIG_FILE="$MODULE_DIR/config/simulate_test.yaml"
 # Path where train data is located
-TRAIN_DATA_DIR="$(dirname $MODULE_DIR)/data/tensors"
+TRAIN_DATA_DIR="$(dirname $MODULE_DIR)/data_add/tensors"
 
 vars=("image" "masked_image" "velocity" "label")
 
