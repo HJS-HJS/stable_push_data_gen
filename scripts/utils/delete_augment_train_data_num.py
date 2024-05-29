@@ -4,7 +4,7 @@ import parmap
 import multiprocessing
 import numpy as np
 
-DELETE_NUM = 3261
+DELETE_NUM = 2845297
 
 # Configure paths
 PATH = os.getcwd()
@@ -28,9 +28,9 @@ image_list = []
 image_list = []
 
 def delete_data(idx):
-    if idx < (max_index - DELETE_NUM):
+    if idx <= DELETE_NUM:
         return
-    name = ("_%0" + str(FILE_NUM_ZERO_PADDING) + 'd.npy')%(idx + 1)
+    name = ("_%0" + str(FILE_NUM_ZERO_PADDING) + 'd.npy')%(idx)
     try: 
         os.remove(data_dir + '/image' + name)
     except:
@@ -51,6 +51,6 @@ def delete_data(idx):
         pass
 
 num_cores = multiprocessing.cpu_count()
-parmap.map(delete_data, range(max_index), pm_pbar={'desc': 'Saving flipped data'}, pm_processes=num_cores, pm_chunksize=num_cores)
+parmap.map(delete_data, range(max_index + 1), pm_pbar={'desc': 'Delete data'}, pm_processes=num_cores, pm_chunksize=num_cores)
 
-print('delete {} from {} data {}'.format(DELETE_NUM, max_index, max_index - DELETE_NUM))
+print('delete {} from {} data {}'.format(DELETE_NUM, max_index + 1, max_index - DELETE_NUM))
