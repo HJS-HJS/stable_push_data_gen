@@ -46,14 +46,16 @@ def move_data(idx):
     try:
         shutil.move(os.path.join(data_add_dir, var + old_name), os.path.join(data_dir, var + new_name))
     except:
+        _checker = False
         if not os.path.isfile(data_add_dir + "/" + var + old_name):
             print("{} file not exist".format(old_name))
+            _checker = True
         if os.path.isfile(data_dir + "/" + var + new_name):
             print("{} file already exists".format(new_name))
-        if os.path.isfile(data_add_dir + "/" + var + old_name) and ( not os.path.isfile(data_dir + "/" + var + new_name)):
+            _checker = True
+
+        if not _checker:
             print("cant move", var," {} to {}".format(old_name, new_name))
-        else:
-            print("wrong")
 
 num_cores = multiprocessing.cpu_count()
 parmap.map(move_data, range(max_add_index + 1 - min_add_index), pm_pbar={'desc': 'Move ' + var + ' data'}, pm_processes=num_cores, pm_chunksize=num_cores)
