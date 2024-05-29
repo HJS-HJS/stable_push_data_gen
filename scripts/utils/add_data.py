@@ -36,13 +36,14 @@ indices = np.sort(indices)
 try:
     max_add_index = indices[-1]
     min_add_index = indices[0]
+    print("move files from {} to {}".format(max_add_index, min_add_index))
 except:
     raise Exception("Data Not Exists")
 
 def move_data(idx):
+    old_name = ("_%0" + str(FILE_NUM_ZERO_PADDING) + 'd.npy')%(min_add_index + idx)
+    new_name = ("_%0" + str(FILE_NUM_ZERO_PADDING) + 'd.npy')%(max_index + idx + 1)
     try:
-        old_name = ("_%0" + str(FILE_NUM_ZERO_PADDING) + 'd.npy')%(min_add_index + idx)
-        new_name = ("_%0" + str(FILE_NUM_ZERO_PADDING) + 'd.npy')%(max_index + idx + 1)
         if not os.path.isfile(data_add_dir, var + old_name):
             print("{} file not exist".format(old_name))
         if not os.path.isfile(data_dir, var + new_name):
@@ -50,7 +51,7 @@ def move_data(idx):
 
         shutil.move(os.path.join(data_add_dir, var + old_name), os.path.join(data_dir, var + new_name))
     except:
-        print("cant move {} to {}".format(old_name, new_name))
+        print("cant move ", var, " {} to {}".format(old_name, new_name))
 
 num_cores = multiprocessing.cpu_count()
 parmap.map(move_data, range(max_add_index + 1 - min_add_index), pm_pbar={'desc': 'Move ' + var + ' data'}, pm_processes=num_cores, pm_chunksize=num_cores)
