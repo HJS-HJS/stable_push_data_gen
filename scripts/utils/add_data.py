@@ -12,6 +12,8 @@ parser.add_argument('--var', required=True, help='Choose which type of train dat
 args = parser.parse_args()
 var = args.var
 
+print("start moving", var)
+
 # Configure paths
 PATH = os.getcwd()
 data_dir = os.path.dirname(os.path.dirname(PATH)) + "/../data/tensors"
@@ -25,7 +27,7 @@ file_list = [file for file in file_list if file.startswith(var)]
 indices = [int(re.findall(r'\d+', file_name)[0]) for file_name in file_list]
 indices = np.sort(indices)
 max_index = indices[-1]
-print("max num in data: {}".format(max_index))
+print("\tnum in data dir: {} ~ {}".format(indices[0], max_index))
 
 try:
     file_list = os.listdir(data_add_dir)
@@ -37,7 +39,7 @@ indices = np.sort(indices)
 try:
     max_add_index = indices[-1]
     min_add_index = indices[0]
-    print("move files from {} to {}".format(min_add_index, max_add_index))
+    print("\tmove files from {} to {}".format(min_add_index, max_add_index))
 except:
     raise Exception(var, "Data Not Exists")
 
@@ -49,14 +51,14 @@ def move_data(idx):
     except:
         _checker = False
         if not os.path.isfile(data_add_dir + "/" + var + old_name):
-            print("{} file not exist".format(old_name))
+            print("\t{} file not exist".format(old_name))
             _checker = True
         if os.path.isfile(data_dir + "/" + var + new_name):
-            print("{} file already exists".format(new_name))
+            print("\t{} file already exists".format(new_name))
             _checker = True
 
         if not _checker:
-            print("cant move", var," {} to {}".format(old_name, new_name))
+            print("\tcant move", var," {} to {}".format(old_name, new_name))
 
 num_cores = multiprocessing.cpu_count()
-parmap.map(move_data, range(max_add_index + 1 - min_add_index), pm_pbar={'desc': 'Move ' + var + ' data'}, pm_processes=num_cores, pm_chunksize=num_cores)
+parmap.map(move_data, range(max_add_index + 1 - min_add_index), pm_pbar={'\tdesc': 'Move ' + var + ' data'}, pm_processes=num_cores, pm_chunksize=num_cores)
