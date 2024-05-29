@@ -46,7 +46,7 @@ def move_data(idx):
     try:
         if not os.path.isfile(data_add_dir, var + old_name):
             print("{} file not exist".format(old_name))
-        if not os.path.isfile(data_dir, var + new_name):
+        if os.path.isfile(data_dir, var + new_name):
             print("{} file already exists".format(new_name))
 
         shutil.move(os.path.join(data_add_dir, var + old_name), os.path.join(data_dir, var + new_name))
