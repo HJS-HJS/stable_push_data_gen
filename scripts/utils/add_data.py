@@ -61,4 +61,4 @@ def move_data(idx):
             print("\tcant move", var," {} to {}".format(old_name, new_name))
 
 num_cores = multiprocessing.cpu_count()
-parmap.map(move_data, range(max_add_index + 1 - min_add_index), pm_pbar={'\tdesc': 'Move ' + var + ' data'}, pm_processes=num_cores, pm_chunksize=num_cores)
+parmap.map(move_data, range(max_add_index + 1 - min_add_index), pm_pbar={'desc': 'Move ' + var + ' data'}, pm_processes=num_cores, pm_chunksize=num_cores)
