@@ -25,6 +25,7 @@ file_list = [file for file in file_list if file.startswith(var)]
 indices = [int(re.findall(r'\d+', file_name)[0]) for file_name in file_list]
 indices = np.sort(indices)
 max_index = indices[-1]
+print("max num in data: {}".format(max_index))
 
 try:
     file_list = os.listdir(data_add_dir)
