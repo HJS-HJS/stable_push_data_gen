@@ -39,7 +39,7 @@ try:
     min_add_index = indices[0]
     print("move files from {} to {}".format(max_add_index, min_add_index))
 except:
-    raise Exception("Data Not Exists")
+    raise Exception(var, "Data Not Exists")
 
 def move_data(idx):
     old_name = ("_%0" + str(FILE_NUM_ZERO_PADDING) + 'd.npy')%(min_add_index + idx)
