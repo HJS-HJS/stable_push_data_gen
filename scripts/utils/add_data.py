@@ -37,7 +37,7 @@ indices = np.sort(indices)
 try:
     max_add_index = indices[-1]
     min_add_index = indices[0]
-    print("move files from {} to {}".format(max_add_index, min_add_index))
+    print("move files from {} to {}".format(min_add_index, max_add_index))
 except:
     raise Exception(var, "Data Not Exists")
 
@@ -45,7 +45,7 @@ def move_data(idx):
     old_name = ("_%0" + str(FILE_NUM_ZERO_PADDING) + 'd.npy')%(min_add_index + idx)
     new_name = ("_%0" + str(FILE_NUM_ZERO_PADDING) + 'd.npy')%(max_index + idx + 1)
     try:
-        shutil.move(os.path.join(data_add_dir, var + old_name), os.path.join(data_dir, var + new_name))
+        shutil.copy(os.path.join(data_add_dir, var + old_name), os.path.join(data_dir, var + new_name))
     except:
         _checker = False
         if not os.path.isfile(data_add_dir + "/" + var + old_name):
