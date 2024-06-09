@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<robot name="pusher" xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:property name="PI" value="3.1415926535897931"/>
+
+  <!-- honeycomb with plate -->
+  <xacro:include filename="../pusher.urdf"/>
+  <xacro:include filename="pusher_vertical.urdf"/>
+
+  <joint name="world-env_joint" type="fixed">
+    <parent link="eef_p"/>
+    <child link="eef"/>
+    <origin 
+      xyz="0 0 0" 
+      rpy="0 0 0"/>
+  </joint>
+</robot>

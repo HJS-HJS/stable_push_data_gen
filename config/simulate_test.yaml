@@ -2,13 +2,14 @@ simulation:
   # simulation environment setup
   num_threads : 12
   FILE_ZERO_PADDING_NUM: 7
+  data_dir: data
   use_gpu: True
   use_gpu_pipeline : False
   compute_device_id: 0
   graphics_device_id: 0
   physics_engine: PHYSX
-  num_iters: 1
-  num_envs: 20
+  num_iters: 12
+  num_envs: 120
   dt: 0.016667
   # camera: IntelRealSenseD415
   camera: IntelRealSenseD415IR
@@ -19,17 +20,27 @@ simulation:
   slider_dataset: urdf
   slider_name: mug_cup02
   # Pusher
+  # Pusher setup
   pusher_dataset: pusher_urdf
-  pusher_name: pusher_vertical
+  # pusher_name: vertical
+  pusher_name: hanyang
+  hanyang:
+    contact_max_width: 0.085 # maximun width of gripper
+    contact_min_width: 0.075 # maximun width of gripper
+    finger_angle: 120 # hanyang
+  vertical:
+    contact_max_width: 0.08 # maximun width of gripper
+    contact_min_width: 0.04 # maximun width of gripper
+    finger_angle: 180 # robotiq2f
+
 
   # Push experiment setup
   push_speed: 0.1
-  initial_distance: 0.05
+  # initial_distance: 0.05
+  initial_distance: 0.1
   translational_push_distance: 0.03 # 0.01
-  gripper_width: 0.08
   gripper_height: 0.02
-  # gripper_height_max: 0.08
-  gripper_angle: 90 # 0 ~ 90 [degree]
+  gripper_angle: [60, 90] # 0 ~ 90 [degree]
   rand_angle: True
   rand_width: True
   env_space: [1.6, 0.8]
