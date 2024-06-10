@@ -8,9 +8,7 @@ import numpy as np
 import trimesh
 
 # mesh rescale prameters
-GRIPPER_WIDTH = 0.08
-GRIPPER_FRAC = 0.8
-gripper_target = GRIPPER_WIDTH * GRIPPER_FRAC
+GRIPPER_WIDTH = 0.1
 DENSE_PET   = 1310  # [kg/m^3]
 DENSE_WATER = 997   # [kg/m^3]
 DENSE_PAPER = 0.075 # [kg/m^3]
@@ -75,43 +73,16 @@ def obj_to_urdf(mesh_dir):
             exts = mesh_tri.bounding_box_oriented.primitive.extents
             max_dim = np.max(exts)
             scale = GRIPPER_WIDTH / max_dim
-            scale = scale * 1.34
-            print('center_of_mass', mesh_tri.center_mass)
-            mesh.apply_scale(0.001) # mm to m scale
-            mesh_tri.apply_scale(0.001) # mm to m scale
-            # print('center_of_mass', mesh_tri.center_mass)
-            # mesh.apply_scale(scale) # mm to m scale
-            # mesh_tri.apply_scale(scale) # mm to m scale
+            mesh.apply_scale(scale) # mm to m scale
+            mesh_tri.apply_scale(scale) # mm to m scale
 
             trimesh.repair.broken_faces(mesh_tri)
             trimesh.repair.fix_inversion(mesh_tri, multibody=True)
-            print('center_of_mass', mesh_tri.center_mass)
     
             mesh.density = DENSE_PET
             mesh_tri.density = DENSE_PET
-            print('vertice: ', mesh_tri.vertices)
-            print('inertia: ', mesh_tri.moment_inertia)
             mesh.vertices -= mesh_tri.center_mass
             mesh_tri.vertices -= mesh_tri.center_mass
-            print('vertice: ', mesh_tri.vertices)
-            print('inertia: ', mesh_tri.moment_inertia)
-            print('center_of_mass', mesh_tri.center_mass)
-
-            scene = trimesh.Scene()
-            scene.add_geometry(mesh)
-            scene.add_geometry(trimesh.creation.axis())
-            scene.show()
-
-            print(
-                '\tVolume[m^3]\tMass[kg]\tScale[-]\tMax Dim[m]\n',
-                f'\t{mesh_tri.volume:.8f}\t{mesh_tri.mass:.8f}\t{scale:.8f}\t{max_dim:.8f}'
-                )
-
-            if False:
-            # if True:
-            # if mesh_tri.mass > 0.1:
-                mesh.show()
-                mesh_tri.show()
 
             # save mesh
             if os.path.exists(os.path.join(urdf_root_dir, mesh_name)):

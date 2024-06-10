@@ -36,7 +36,7 @@ class SelectStablePose(object):
     def check_for_object(self):
         self.is_modified = False
         self.stable_poses = np.load(self.asset_dir + self.current_object + '/stable_poses.npy', allow_pickle=True)
-        self.stable_probs = np.load(self.asset_dir + self.current_object + '/stable_prob.npy', allow_pickle=True)
+
         # Normal case where there are multiple stable poses
         print("Pose: ", len(self.stable_poses.shape), "\tCurrent object: ", self.current_object)
         if len(self.stable_poses.shape) == 3:
@@ -44,6 +44,7 @@ class SelectStablePose(object):
             while (idx<self.stable_poses.shape[0]):
                 if self.is_modified:
                     break
+                self.stable_probs = np.load(self.asset_dir + self.current_object + '/stable_prob.npy', allow_pickle=True)
                 print("Idx: ", idx, "/", self.stable_poses.shape[0]-1, "\tProb: ", self.stable_probs[idx])
                 self.current_idx = idx
                 self.current_pose = self.stable_poses[idx]
@@ -93,6 +94,7 @@ class SelectStablePose(object):
         vis.register_key_callback(ord('.'), self.rotate_mesh_right)
         vis.register_key_callback(ord(','), self.rotate_mesh_left)
         vis.register_key_callback(ord('R'), self.reset_camera_pose)
+        vis.register_key_callback(ord('J'), self.jump_to_next_mesh)
         # vis.register_key_callback(ord('M'), self.modify_stable_pose)
         vis.create_window(window_name=self.current_object)
 
@@ -209,6 +211,11 @@ class SelectStablePose(object):
         view_ctl = vis.get_view_control()
         view_ctl.set_front([1.0, 0.0, 0.0])
         view_ctl.set_up([0.0, 0.0, 1.0])
+    def jump_to_next_mesh(self, vis):
+        self.next_idx = 100
+        vis.close()
+
+        
 
 if __name__ == '__main__':
     select = SelectStablePose(assets_dir)

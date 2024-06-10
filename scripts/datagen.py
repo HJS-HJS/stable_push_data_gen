@@ -91,8 +91,8 @@ class PushSim(object):
         self.initial_distance = sim_cfg["initial_distance"]
         # Gripper width
         self.contact_max_width = sim_cfg[self.pusher_name]["contact_max_width"]
-        self.contact_min_width = sim_cfg[self.pusher_name]["contact_min_width"]
-        self.finger_angle = np.deg2rad(180 - sim_cfg[self.pusher_name]["finger_angle"]) / 2
+        self.contact_width_range = sim_cfg[self.pusher_name]["contact_width_range"]
+        self.finger_angle = np.deg2rad(sim_cfg[self.pusher_name]["finger_angle"]) / 2
         # Gripper height
         self.gripper_height = sim_cfg["gripper_height"]
         # Gripper angle
@@ -416,7 +416,7 @@ class PushSim(object):
         pusher_asset_options.armature = 0.01
         pusher_asset_options.disable_gravity = True 
         pusher_asset_options.vhacd_enabled = True
-        pusher_asset_options.vhacd_params.resolution = 80000
+        pusher_asset_options.vhacd_params.resolution = 30000
         pusher_asset_options.vhacd_params.max_convex_hulls = 50
         pusher_asset_options.vhacd_params.max_num_vertices_per_ch = 64
 
@@ -729,19 +729,20 @@ class PushSim(object):
             self.gripper_offset = np.zeros(self.num_envs)
         elif self.pusher_name == "hanyang":
             if self.rand_width:
-                try:
-                    self.contact_shorten_widths = np.random.rand(self.num_envs) * (self.contact_max_width - self.contact_min_width)
-                    spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, self.contact_max_width - self.contact_shorten_widths)
-                    print("Sampling push contacts in range {}, {}".format(self.contact_max_width, self.contact_min_width))
-                    push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
-                    print("Generate contact points")
-                except:
-                    self.contact_shorten_widths = np.repeat(self.contact_min_width - self.contact_min_width, self.num_envs)
-                    spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, self.contact_max_width - self.contact_shorten_widths)
-                    print("Sampling push contacts {}".format(self.contact_max_width))
-                    push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
-                    print("Generate contact points")
-            self.gripper_offset = -0.038990381 - (self.contact_max_width - self.contact_min_width - self.contact_shorten_widths) * np.cos(np.pi/3)
+                self.contact_shorten_widths = np.random.rand(self.num_envs) * (self.contact_width_range[0] - self.contact_width_range[1]) + (self.contact_max_width - self.contact_width_range[0])
+                spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, np.repeat(0.075,self.num_envs))
+                print("Sampling push contacts in range {}, {}".format(self.contact_width_range[0], self.contact_width_range[1]))
+                push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
+                print("Generate contact points")
+            else:
+                self.contact_shorten_widths = np.repeat(self.contact_max_width - self.contact_width_range[0], self.num_envs)
+                spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, np.repeat(0.075,self.num_envs))
+                print("Sampling push contacts in range {}, {}".format(self.contact_width_range[0], self.contact_width_range[1]))
+                push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
+                print("Generate contact points")
+
+            self.gripper_offset = -0.038990381 + (self.contact_shorten_widths) / 2 / np.tan(self.finger_angle)
+
         else:
             self.gripper_offset = np.zeros(self.num_envs)
 
@@ -1184,16 +1185,16 @@ class PushSim(object):
                     _pusher_pose = np.hstack([waypoint[env_idx],
                                               self.gripper_offset[env_idx],
                                               self.pusher_velocities[env_idx,1],
-                                              -self.contact_shorten_widths[env_idx] / (2 * np.cos(self.finger_angle)), 
-                                              -self.contact_shorten_widths[env_idx] / (2 * np.cos(self.finger_angle))]
+                                              -self.contact_shorten_widths[env_idx] / (2 * np.sin(self.finger_angle)), 
+                                              -self.contact_shorten_widths[env_idx] / (2 * np.sin(self.finger_angle))]
                                               ).astype(np.float32)
                 elif self.pusher_name == "hanyang":
                     _pusher_pose = np.hstack([waypoint[env_idx],
                                               self.gripper_offset[env_idx],
                                               self.pusher_velocities[env_idx,1],
-                                              self.contact_shorten_widths[env_idx] / (2 * np.cos(self.finger_angle)),
+                                              -self.contact_shorten_widths[env_idx] / (2 * np.sin(self.finger_angle)),
                                               0,
-                                              self.contact_shorten_widths[env_idx] / (2 * np.cos(self.finger_angle)),
+                                              -self.contact_shorten_widths[env_idx] / (2 * np.sin(self.finger_angle)),
                                               0]
                                               ).astype(np.float32)
                 else:

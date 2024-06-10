@@ -21,12 +21,14 @@ num_new_mesh = args.num
 assets_dir = args.urdf_dir
 
 # mesh rescale prameters
-GRIPPER_WIDTH = 0.08
+GRIPPER_WIDTH = 0.14
 GRIPPER_FRAC = 0.8
 gripper_target = GRIPPER_WIDTH * GRIPPER_FRAC
 DENSE_PET   = 1310  # [kg/m^3]
 MAX_DISH_SIZE = 0.32 # in meters
 MIN_DISH_SIZE = gripper_target # in meters
+MAX_DISH_Z_SIZE = 0.093 # in meters
+MIN_DISH_Z_SIZE = 0.018 # in meters
 
 urdf_ext = '.urdf'
 obj_ext = ['.obj', '.stl', '.STL']
@@ -89,52 +91,34 @@ def obj_to_urdf(asset_name):
     x_size, y_size, z_size = mesh.extents
     max_x_scale_factor = MAX_DISH_SIZE / x_size
     max_y_scale_factor = MAX_DISH_SIZE / y_size
-    max_z_scale_factor = MAX_DISH_SIZE / z_size
+    max_z_scale_factor = MAX_DISH_Z_SIZE / z_size
     
     min_x_scale_factor = MIN_DISH_SIZE / x_size
     min_y_scale_factor = MIN_DISH_SIZE / y_size
-    min_z_scale_factor = MIN_DISH_SIZE / z_size
+    min_z_scale_factor = MIN_DISH_Z_SIZE / z_size
     
     if not mesh.is_watertight:
         print('{} is not watertight.'.format(asset_name))
     
-    for i in range(num_new_mesh):
-        
-        target_name = asset_name + '_' + str(i)
+    if num_new_mesh == 1:
+        target_name = asset_name + '_' + str(0)
         
         # make directory
         os.makedirs(os.path.join(assets_dir, target_name), exist_ok=True)
         new_asset_path = os.path.join(assets_dir, target_name)
         
         # Create a scaling transformation matrix
-        if i < int(num_new_mesh-2):
-            max_scale_factor = max_x_scale_factor if max_x_scale_factor < max_y_scale_factor else max_y_scale_factor
-            min_scale_factor = min_x_scale_factor if min_x_scale_factor > min_y_scale_factor else min_y_scale_factor
-            scale_factor = np.random.choice(np.linspace(min_scale_factor,max_scale_factor,1000))
-            scale_matrix = np.diag([scale_factor, 
-                                    scale_factor, 
-                                    1.0, 
-                                    1.0])
-        else:
-            x_scale_factor = np.random.choice(np.linspace(min_x_scale_factor,max_x_scale_factor,1000))
-            y_scale_factor = np.random.choice(np.linspace(x_scale_factor/2 if x_scale_factor/2 > min_y_scale_factor else min_y_scale_factor,
-                                                          x_scale_factor*2 if x_scale_factor*2 < max_y_scale_factor else max_y_scale_factor,1000))
+        z_scale_factor = np.random.choice(np.linspace(min_z_scale_factor,max_z_scale_factor,1000))
 
-            scale_matrix = np.diag([x_scale_factor, 
-                                    y_scale_factor, 
-                                    1.0, 
-                                    1.0])
+        scale_matrix = np.diag([1.0, 
+                                1.0, 
+                                z_scale_factor, 
+                                1.0])
 
         # Apply the scaling transformation to the mesh vertices
         new_mesh = copy.deepcopy(mesh)
         new_mesh = trimesh.transformations.transform_points(new_mesh.vertices, scale_matrix)
         new_mesh = trimesh.Trimesh(vertices=new_mesh, faces=mesh.faces)
-        
-        # Check 
-        x_size, y_size, _ = new_mesh.extents
-        if x_size > MAX_DISH_SIZE or y_size > MAX_DISH_SIZE:
-            print('The modified mesh size is larger than the maximum dish size.')
-            continue
         
         new_mesh.export(os.path.join(new_asset_path, target_name + obj_ext))
 
@@ -183,7 +167,93 @@ def obj_to_urdf(asset_name):
         
         with open(os.path.join(new_asset_path, target_name + urdf_ext), 'wb') as f:
             tree.write(f, encoding='utf-8', xml_declaration=True)
-        
+    else:
+        for i in range(num_new_mesh):
+            
+            target_name = asset_name + '_' + str(i)
+            
+            # make directory
+            os.makedirs(os.path.join(assets_dir, target_name), exist_ok=True)
+            new_asset_path = os.path.join(assets_dir, target_name)
+            
+            # Create a scaling transformation matrix
+            if i < int(num_new_mesh-2):
+                max_scale_factor = max_x_scale_factor if max_x_scale_factor < max_y_scale_factor else max_y_scale_factor
+                min_scale_factor = min_x_scale_factor if min_x_scale_factor > min_y_scale_factor else min_y_scale_factor
+                scale_factor = np.random.choice(np.linspace(min_scale_factor,max_scale_factor,1000))
+                scale_matrix = np.diag([scale_factor, 
+                                        scale_factor, 
+                                        1.0, 
+                                        1.0])
+            else:
+                x_scale_factor = np.random.choice(np.linspace(min_x_scale_factor,max_x_scale_factor,1000))
+                y_scale_factor = np.random.choice(np.linspace(x_scale_factor/2 if x_scale_factor/2 > min_y_scale_factor else min_y_scale_factor,
+                                                            x_scale_factor*2 if x_scale_factor*2 < max_y_scale_factor else max_y_scale_factor,1000))
+
+                scale_matrix = np.diag([x_scale_factor, 
+                                        y_scale_factor, 
+                                        1.0, 
+                                        1.0])
+
+            # Apply the scaling transformation to the mesh vertices
+            new_mesh = copy.deepcopy(mesh)
+            new_mesh = trimesh.transformations.transform_points(new_mesh.vertices, scale_matrix)
+            new_mesh = trimesh.Trimesh(vertices=new_mesh, faces=mesh.faces)
+            
+            # Check 
+            x_size, y_size, _ = new_mesh.extents
+            if x_size > MAX_DISH_SIZE or y_size > MAX_DISH_SIZE:
+                print('The modified mesh size is larger than the maximum dish size.')
+                continue
+            
+            new_mesh.export(os.path.join(new_asset_path, target_name + obj_ext))
+
+            # Apply the scaling transformation to the stable pose
+            new_stable_pose = stable_pose.copy()
+            try:
+                new_stable_pose[:3, 3] = trimesh.transformations.transform_points(stable_pose[:3, 3].reshape(-1,3), scale_matrix)
+            except:
+                print(f"Stable pose of {target_name} is not singular. ")
+
+            new_stable_pose = np.eye(4)
+            
+            # Save the stable pose
+            np.save(os.path.join(new_asset_path, 'stable_poses.npy'), new_stable_pose)
+
+            new_mesh.density = DENSE_PET
+            new_mesh.vertices -= new_mesh.center_mass
+
+            # create urdf file
+            urdf = ET.Element('robot', name=target_name)
+            link = ET.SubElement(urdf, 'link', name=target_name)
+            inertial = ET.SubElement(link, 'inertial')
+            mass = ET.SubElement(inertial, 'mass', value=str(new_mesh.mass))
+            inertia_dict = {'ixx': str(new_mesh.moment_inertia[0, 0]),
+                            'ixy': str(new_mesh.moment_inertia[0, 1]),
+                            'ixz': str(new_mesh.moment_inertia[0, 2]),
+                            'iyy': str(new_mesh.moment_inertia[1, 1]),
+                            'iyz': str(new_mesh.moment_inertia[1, 2]),
+                            'izz': str(new_mesh.moment_inertia[2, 2])}
+            inertia = ET.SubElement(inertial, 'inertia', inertia_dict)
+
+            visual = ET.SubElement(link, 'visual')
+            origin = ET.SubElement(visual, 'origin', xyz='0 0 0', rpy='0 0 0')
+            geometry = ET.SubElement(visual, 'geometry')
+            _mesh = ET.SubElement(geometry, 'mesh', filename=os.path.join(new_asset_path, target_name + obj_ext), scale='1 1 1')
+
+            collision = ET.SubElement(link, 'collision')
+            origin = ET.SubElement(collision, 'origin', xyz='0 0 0', rpy='0 0 0')
+            geometry = ET.SubElement(collision, 'geometry')
+            _mesh = ET.SubElement(geometry, 'mesh', filename=os.path.join(new_asset_path, target_name + obj_ext), scale='1 1 1')
+
+            # save urdf file
+            indent(urdf)
+            
+            tree = ET.ElementTree(urdf)
+            
+            with open(os.path.join(new_asset_path, target_name + urdf_ext), 'wb') as f:
+                tree.write(f, encoding='utf-8', xml_declaration=True)
+            
         
 if __name__ == '__main__':
     # get file list

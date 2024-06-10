@@ -95,7 +95,7 @@
     <child link="eef_y"/>
     <axis xyz="1 0 0"/>
     <dynamics damping="10.0"/>
-    <limit effort="10" lower="-0.1" upper="0.1" velocity="10"/>
+    <limit effort="10" lower="0" upper="0.1" velocity="10"/>
   </joint>
 
   <link name="eef_p">

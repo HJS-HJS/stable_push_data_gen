@@ -8,8 +8,10 @@ simulation:
   compute_device_id: 0
   graphics_device_id: 0
   physics_engine: PHYSX
-  num_iters: 12
+  num_iters: 4
   num_envs: 120
+  # num_iters: 10
+  # num_envs: 15
   dt: 0.016667
   # camera: IntelRealSenseD415
   camera: IntelRealSenseD415IR
@@ -25,12 +27,13 @@ simulation:
   # pusher_name: vertical
   pusher_name: hanyang
   hanyang:
-    contact_max_width: 0.085 # maximun width of gripper
-    contact_min_width: 0.075 # maximun width of gripper
+    contact_max_width: 0.075066642 # maximun width of gripper
+    contact_width_range: [0.1188, 0.270] # maximun width of gripper
+    # contact_width_range: [0.08, 0.085] # maximun width of gripper
     finger_angle: 120 # hanyang
   vertical:
     contact_max_width: 0.08 # maximun width of gripper
-    contact_min_width: 0.04 # maximun width of gripper
+    contact_width_range: [0.08, 0.04] # maximun width of gripper
     finger_angle: 180 # robotiq2f
 
 
@@ -39,7 +42,7 @@ simulation:
   # initial_distance: 0.05
   initial_distance: 0.1
   translational_push_distance: 0.03 # 0.01
-  gripper_height: 0.02
+  gripper_height: 0.015
   gripper_angle: [60, 90] # 0 ~ 90 [degree]
   rand_angle: True
   rand_width: True
@@ -168,7 +171,7 @@ camera:
       tran: [-1.0649844006838340, 0.095766369044197786, 0.95766369044197786]
       rot: [0.0032768099437612097, 0.9842047843130775, -0.015359940559485506, 0.17633569484891592]
 
-      matrix: [ -9.5284142039327635e-01, 2.1412216810855048e-02, 3.0271231318558661e-01, -1.0649844006838340e+00,
-        1.2093728749856781e-02, 9.9939450765343596e-01, -3.2624527537913145e-02, 9.5766369044197786e-02,
-        -3.0322758665373545e-01, -2.7425080553976539e-02, -9.5252343574778220e-01, 9.5766369044197786e-01,
-        0., 0., 0., 1. ]
+      matrix: [ -8.5569721560574574e-01, 2.2343946770028968e-02, 5.1699421974265070e-01, -1.0899655555781094e+00, 
+      -2.6099837142490711e-03, 9.9886830719852659e-01, -4.7489923766640164e-02, 3.2222773219672325e-02, 
+      -5.1747025343451902e-01, -4.1986342030332337e-02, -8.5467051188942200e-01, 9.5899668517686798e-01, 
+      0., 0., 0., 1. ]
