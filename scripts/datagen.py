@@ -729,25 +729,27 @@ class PushSim(object):
             self.gripper_offset = np.zeros(self.num_envs)
         elif self.pusher_name == "hanyang":
             if self.rand_width:
+                spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, np.repeat(0.075,self.num_envs))
+                print("Sampling push contacts in range {}, {}".format(self.contact_width_range[0], self.contact_width_range[1]))
+                push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
+                print("Generate contact points")
                 self.contact_shorten_widths = np.random.rand(self.num_envs) * (self.contact_width_range[0] - self.contact_width_range[1]) + (self.contact_max_width - self.contact_width_range[0])
-                spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, np.repeat(0.075,self.num_envs))
-                print("Sampling push contacts in range {}, {}".format(self.contact_width_range[0], self.contact_width_range[1]))
-                push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
-                print("Generate contact points")
             else:
-                self.contact_shorten_widths = np.repeat(self.contact_max_width - self.contact_width_range[0], self.num_envs)
                 spc = SamplePushContactParallel(self.num_envs, self.camera_intrinsic, np.repeat(0.075,self.num_envs))
-                print("Sampling push contacts in range {}, {}".format(self.contact_width_range[0], self.contact_width_range[1]))
                 push_contact_list = spc.sample_push_contacts(depth_images, segmasks, self.camera_poses)
-                print("Generate contact points")
+                _max, _min = np.argmax(push_contact_list[0].edge_xyz, axis=0)[0:-1], np.argmin(push_contact_list[0].edge_xyz, axis=0)[0:-1]
+                _leng_a, _leng_b = np.linalg.norm(push_contact_list[0].edge_xyz[_max[0]][0:-1] - push_contact_list[0].edge_xyz[_min[0]][0:-1]), np.linalg.norm(push_contact_list[0].edge_xyz[_max[1]][0:-1] - push_contact_list[0].edge_xyz[_min[1]][0:-1])
+                _dish_lengh = _leng_a if _leng_a > _leng_b else _leng_b
+                _dish_lengh = _dish_lengh if _dish_lengh < np.max(self.contact_width_range) else np.max(self.contact_width_range)
+                _dish_lengh = _dish_lengh if _dish_lengh > np.min(self.contact_width_range) else np.min(self.contact_width_range)
+                print("Sampling push contacts in range {}, {}".format(self.contact_width_range[0], _dish_lengh))
+                self.contact_shorten_widths = np.random.rand(self.num_envs) * (self.contact_width_range[0] - _dish_lengh) + (self.contact_max_width - self.contact_width_range[0])
 
-            self.gripper_offset = -0.038990381 + (self.contact_shorten_widths) / 2 / np.tan(self.finger_angle)
+            # self.gripper_offset = -0.038990381 + (self.contact_shorten_widths) / 2 / np.tan(self.finger_angle)
+            self.gripper_offset = -0.00 + (self.contact_shorten_widths) / 2 / np.tan(self.finger_angle)
 
         else:
-            self.gripper_offset = np.zeros(self.num_envs)
-
-            
-
+            self.gripper_offset = np.zeros(self.num_envs)     
         # sample a contact point
         # self._gripper_width_change = 0
         # while (self._gripper_width_change < self.contact_max_width):

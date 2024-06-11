@@ -339,13 +339,16 @@ def evaluate_push_stability(eef_slider_pose_initial, eef_slider_pose_final, thre
     rel_poses = np.einsum('...ij,...jk->...ik', poses_init_inv, poses_final)
     
     rel_positions = rel_poses[:,:3,3]
-    rel_rotations_euler = R.from_matrix(rel_poses[:,:3,:3]).as_euler('xyz', degrees=True)
+    rel_rotations_euler = R.from_matrix(rel_poses[:,:3,:3]).as_euler('xyz', degrees=True)[:,0:-1]
     
     # for i in range(len(rel_positions)):
-    #     print(i+1,'pos: {:.4f}\trot: {:.4f}'.format(np.linalg.norm(rel_positions[i]), np.linalg.norm(np.abs(rel_rotations_euler[i]))))
-    #     is_close_position = np.all(np.linalg.norm(rel_positions[i]) < threshold_pos)
-    #     is_close_rotation = np.all(np.linalg.norm(rel_rotations_euler[i]) < threshold_rot)
-    #     print('\t', is_close_position, is_close_rotation)
+        # print(i+1,'pos: {:.4f}\trot: {:.4f}'.format(np.linalg.norm(rel_positions[i]), np.linalg.norm(np.abs(rel_rotations_euler[i]))))
+        # # is_close_position = np.all(np.linalg.norm(rel_positions[i]) < threshold_pos)
+        # # is_close_rotation = np.all(np.linalg.norm(rel_rotations_euler[i]) < threshold_rot)
+        # is_close_position = np.all(np.abs(rel_positions[i]) < threshold_pos)
+        # is_close_rotation = np.all(np.abs(rel_rotations_euler[i]) < threshold_rot)
+        # print('\t', is_close_position, is_close_rotation)
+        # print('\t', rel_positions[i])
         # print('\t', rel_rotations_euler[i])
 
     # print('[', end='')
