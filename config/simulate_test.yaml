@@ -13,9 +13,7 @@ simulation:
   # num_iters: 10
   # num_envs: 15
   dt: 0.016667
-  # camera: IntelRealSenseD415
   camera: IntelRealSenseD415IR
-  # camera: ZividTwo
 
   # Asset setup
   # slider(dish mesh)
@@ -29,7 +27,6 @@ simulation:
   hanyang:
     contact_max_width: 0.075066642 # maximun width of gripper
     contact_width_range: [0.1188, 0.270] # maximun width of gripper
-    # contact_width_range: [0.08, 0.085] # maximun width of gripper
     finger_angle: 120 # hanyang
   vertical:
     contact_max_width: 0.08 # maximun width of gripper
@@ -51,9 +48,7 @@ simulation:
 
   # Slider setup
   slider_rand_position_offset: [0.15, 0.05] # [m, m] checked
-  # slider_rand_position_offset: [-0.45, 0.3] # [m, m] checked
   slider_rand_position_range: [0.3, 0.4] # [%, %]
-  # slider_rand_position_range: [0, 0] # [%, %]
   slider_rand_rotation_range: 180 # degrees 180
   camera_rand_position_range: 0 # meters 0.05
   camera_rand_rotation_range: 0 #degrees 10
@@ -83,45 +78,6 @@ camera:
       x: -0.67 # meters 
       z: 0.95 # meters
       r: 13.5 # deg
-
-  AzureKinect:
-    depth:
-      fx: 305.9728241
-      fy: 305.94388962
-      cx: 320.10463715
-      cy: 244.73226547
-
-    color:
-      fx: 315.139
-      fy: 236.372
-      cx: 326.8280  
-      cy: 245.1210
-
-  IntelRealSenseD455:
-    color:
-      fx: 638.336669921875
-      fy: 636.845703125
-      cx: 630.5924072265625
-      cy: 360.6282958984375
-
-    depth:
-      fx: 425.9282531738281
-      fy: 425.9282531738281
-      cx: 424.21240234375
-      cy: 233.66128540039062
-
-  IntelRealSenseD435:
-    color:
-      fx: 924.0841674804688
-      fy: 924.6384887695312
-      cx: 638.2789306640625
-      cy: 373.99615478515625
-
-    depth:
-      fx: 924.0841674804688
-      fy: 924.6384887695312
-      cx: 638.2789306640625
-      cy: 373.99615478515625
       
   IntelRealSenseD415:
     # fx: 1783.0662841796875
@@ -146,9 +102,6 @@ camera:
       cy: 540
 
     camera_pose:
-      # x: -1.08 # meters
-      # z: 0.95 # meters
-      # r: 10 # deg
       x: -0.5 # meters
       z: 3.5 # meters
       r: 0 # deg
@@ -160,13 +113,6 @@ camera:
     fy: 893.821044921875
     cx: 633.1265258789062
     cy: 354.4530334472656
-
-    # fx: 1367.0645751953125
-    # fy: 1365.3912353515625
-    # cx: 974.408203125
-    # cy: 528.857666015625
-
-
 
     camera_pose:
       tran: [-1.0649844006838340, 0.095766369044197786, 0.95766369044197786]
