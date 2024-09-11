@@ -23,11 +23,11 @@ do
     # if [ $dish = '1be987c137d37f0b7c15f7bdb6fa82dd_4' ] ; then
     # if [ $dish = '2eb4cfc59205bb3a147c505998f546dd' ] ; then
     # if [ $dish = 'Y6995_cerembowl_4' ] ; then
-    # if [ $dish = 'melamineware_g_0412' ] ; then
+    if [ $dish = 'melamineware_g_0412_0' ] ; then
     # if [ $dish = 'scan_dish_4' ] ; then
-    if [ $dish = 'mug_cup02' ] ; then
+    # if [ $dish = 'mug_cup02' ] ; then
         sudo pkill python3
-        # python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
-        python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
+        python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --save_results --slider_name $dish 
+        # python3 $SCRIPT_DIR/datagen.py --config $CONFIG_DIR --asset_dir $ASSSET_DIR --slider_name $dish 
     fi
 done

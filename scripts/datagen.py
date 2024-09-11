@@ -33,8 +33,8 @@ class PushSim(object):
         parser = argparse.ArgumentParser(description="Push Sim: Push simulation of tableware for stable pushing network training data generation")
         parser.add_argument('--config', type=str, default="/home/rise/catkin_ws/src/stable-pushnet-datagen/config/config_pushsim.yaml", help='Configuration file')
         parser.add_argument('--asset_dir', type=str, help='Directory of asset folder')
-        # parser.add_argument('--headless', type=bool, default=False, help='Turn on the viewer')
-        parser.add_argument('--headless', type=bool, default=True, help='Turn off the viewer')
+        parser.add_argument('--headless', type=bool, default=False, help='Turn on the viewer')
+        # parser.add_argument('--headless', type=bool, default=True, help='Turn off the viewer')
         parser.add_argument('--save_results', action='store_true', help='save results')
         parser.add_argument('--slider_name', type=str, help='Slider Name')
         self.args = parser.parse_args()
@@ -49,14 +49,14 @@ class PushSim(object):
 
     def _load_configuration(self):
         ''' Configurate the entire simulation by conveying config data from configuration file '''
-        ## Load args ############################################################################### 
+        # Load args
         config_file = self.args.config
         self.asset_dir = self.args.asset_dir
         self.headless = self.args.headless
         self.save_results = self.args.save_results
         self.slider_name = self.args.slider_name
         
-        ## Load config file ########################################################################
+        # Load config file
         with open(config_file,'r') as f:
             cfg = yaml.load(f, Loader=yaml.FullLoader)
         
@@ -389,7 +389,7 @@ class PushSim(object):
         slider_asset_options.mesh_normal_mode = gymapi.COMPUTE_PER_VERTEX
         slider_asset_options.vhacd_enabled = True
         slider_asset_options.vhacd_params.resolution = 300000
-        slider_asset_options.vhacd_params.max_convex_hulls = 50
+        slider_asset_options.vhacd_params.max_convex_hulls = 55
         slider_asset_options.vhacd_params.max_num_vertices_per_ch = 1000
 
         print("Loading asset '%s' from '%s'" % (slider_asset_file, slider_directory))
@@ -666,16 +666,16 @@ class PushSim(object):
 #############################################################################################
 
 
-        # fig = plt.figure()
-        # col = int(np.ceil(np.sqrt(self.num_envs)))
-        # for i in range(self.num_envs):
-        #     ax = fig.add_subplot(col * 3,col,3 * i + 1)
-        #     ax.imshow(depth_images[i])
-        #     ax = fig.add_subplot(col * 3,col,3 * i + 2)
-        #     ax.imshow(ir_depth_images[i])
-        #     ax2 = fig.add_subplot(col * 3,col,3 * i + 3)
-        #     ax2.imshow(segmasks[i])
-        # plt.show()
+        fig = plt.figure()
+        col = int(np.ceil(np.sqrt(self.num_envs)))
+        for i in range(self.num_envs):
+            ax = fig.add_subplot(col * 3,col,3 * i + 1)
+            ax.imshow(depth_images[i])
+            ax = fig.add_subplot(col * 3,col,3 * i + 2)
+            ax.imshow(ir_depth_images[i])
+            ax2 = fig.add_subplot(col * 3,col,3 * i + 3)
+            ax2.imshow(segmasks[i])
+        plt.show()
 
         # fig = plt.figure()
         # col = int(np.ceil(np.sqrt(self.num_envs)))
@@ -850,12 +850,12 @@ class PushSim(object):
                         
                 self.image_idx += 1
 
-            # fig = plt.figure(figsize=(10,10))
-            # col = int(np.ceil(np.sqrt(self.num_envs)))
-            # for i in range(self.num_envs):
-            #     ax = fig.add_subplot(col,col,i+1)
-            #     ax.imshow(cropped_segmasks[i] * cropped_depth_images[i])
-            # plt.show()
+            fig = plt.figure(figsize=(10,10))
+            col = int(np.ceil(np.sqrt(self.num_envs)))
+            for i in range(self.num_envs):
+                ax = fig.add_subplot(col,col,i+1)
+                ax.imshow(cropped_segmasks[i] * cropped_depth_images[i])
+            plt.show()
                     
         print('Save network inputs from ', self.init_file_idx + 1, 'to ', self.image_idx)
         return push_contact_list

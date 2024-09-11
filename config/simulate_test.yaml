@@ -8,22 +8,21 @@ simulation:
   compute_device_id: 0
   graphics_device_id: 0
   physics_engine: PHYSX
-  num_iters: 4
-  num_envs: 120
-  # num_iters: 10
-  # num_envs: 15
+  # num_iters: 4
+  # num_envs: 120
+  num_iters: 1
+  num_envs: 15
   dt: 0.016667
   camera: IntelRealSenseD415IR
 
   # Asset setup
-  # slider(dish mesh)
+  # Slider(dish mesh)
   slider_dataset: urdf
   slider_name: mug_cup02
-  # Pusher
   # Pusher setup
   pusher_dataset: pusher_urdf
-  # pusher_name: vertical
-  pusher_name: hanyang
+  pusher_name: vertical # vertical, hanyang
+
   hanyang:
     contact_max_width: 0.075066642 # maximun width of gripper
     contact_width_range: [0.1188, 0.270] # maximun width of gripper
@@ -33,37 +32,34 @@ simulation:
     contact_width_range: [0.08, 0.04] # maximun width of gripper
     finger_angle: 180 # robotiq2f
 
-
   # Push experiment setup
   push_speed: 0.1
   # initial_distance: 0.05
   initial_distance: 0.1
   translational_push_distance: 0.03 # 0.01
-  gripper_height: 0.015
-  gripper_angle: [60, 90] # 0 ~ 90 [degree]
+  gripper_height: 0.015             # [mm] height from table surface
+  gripper_angle: [60, 90]           # [degree] 90(perpendicular to the floor) ~ 0(parallel to the floor)
   rand_angle: True
-  # rand_width: True
-  rand_width: False
-  env_space: [1.6, 0.8]
+  rand_width: True
+  env_space: [1.6, 0.8]             # table size
 
   # Slider setup
   slider_rand_position_offset: [0.15, 0.05] # [m, m] checked
-  slider_rand_position_range: [0.3, 0.4] # [%, %]
-  slider_rand_rotation_range: 180 # degrees 180
-  camera_rand_position_range: 0 # meters 0.05
-  camera_rand_rotation_range: 0 #degrees 10
+  slider_rand_position_range: [0.3, 0.4]    # [%, %]
+  slider_rand_rotation_range: 180           # [degrees] 180
+  camera_rand_position_range: 0             # [m] 0.05
+  camera_rand_rotation_range: 0             # [degrees] 10
 
   # contact point noise (offset)
-  contact_offset_position_range: 0 # meters
-  contact_offset_rotation_range: 0 # degrees
+  contact_offset_position_range: 0 # [m]
+  contact_offset_rotation_range: 0 # [degrees]
 
   # Labeling threshold
-  threshold_pos: 0.01 # meters
-  threshold_rot: 15 # degrees 15
+  threshold_pos: 0.01   # [m]
+  threshold_rot: 15     # [degrees]
 
   # Friction coefficients
   pusher_friction_coefficient: 0.1
-
   min_friction_coefficient: 0.8
   max_friction_coefficient: 1.2
 
@@ -80,10 +76,6 @@ camera:
       r: 13.5 # deg
       
   IntelRealSenseD415:
-    # fx: 1783.0662841796875
-    # fy: 1782.3050537109375
-    # cx: 980
-    # cy: 610.2705688476562
     fx: 1367.0645751953125
     fy: 1365.3912353515625
     cx: 974.408203125
